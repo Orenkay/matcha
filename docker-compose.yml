@@ -1,0 +1,32 @@
+version: "3"
+services:
+  postgres:
+    image: postgres:latest
+    environment:
+      HOST: 0.0.0.0
+      POSTGRES_USER: matcha
+      POSTGRES_PASSWORD: matcha
+      POSTGRES_DB: matcha
+
+  pgweb:
+    restart: always
+    image: sosedoff/pgweb
+    ports:
+      - "8081:8081"
+    links:
+      - postgres
+    environment:
+      - DATABASE_URL=postgres://matcha:matcha@postgres:5432/matcha?sslmode=disable
+    depends_on:
+      - postgres
+
+  matcha:
+    build: .
+    image: matcha
+    entrypoint: go run ./cmd/matcha/main.go
+    links:
+      - postgres
+    ports:
+      - "3000:3000"
+    environment:
+      ENVIRONMENT: prod
