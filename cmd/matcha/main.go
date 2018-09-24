@@ -20,8 +20,8 @@ func main() {
 
 	store := &store.Store{
 		UserService:       postgres.NewUserService(db),
-		ValidationService: postgres.ValidationService(db),
-		AuthToken:         memory.NewAuthTokenService(db),
+		ValidationService: postgres.NewValidationService(db),
+		AuthTokenService:  memory.NewAuthTokenService(),
 	}
 
 	server := server.New(store)

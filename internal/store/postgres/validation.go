@@ -34,32 +34,29 @@ func (s *ValidationService) Add(userID int64, code string) error {
 	return err
 }
 
-// IsUsed check if given user is valided
-func (s *ValidationService) IsUsed(userID int64) (bool, error) {
+// IsValidated check if given user is valided
+func (s *ValidationService) IsValidated(userID int64) (bool, error) {
 	var valid bool
 	err := s.db.QueryRow("SELECT used FROM validations WHERE userId=$1", userID).Scan(&valid)
 	if err != nil {
 		return false, err
 	}
-	return true, nil
+	return valid, nil
 }
 
-// Code return validation code associated with the given UserID
-func (s *ValidationService) Code(userID int64) (string, error) {
-	var userCode string
-
-	err := s.db.QueryRow("SELECT code FROM validations WHERE userId=$1", userID).Scan(&userCode)
+func (s *ValidationService) CheckCode(userID int64, code string) (bool, error) {
+	var (
+		code2 string
+	)
+	err := s.db.QueryRow("SELECT code FROM validations WHERE userId=$1", userID).Scan(&code2)
 	if err != nil {
-		if err == sql.ErrNoRows {
-			return "", nil
-		}
-		return "", err
+		return false, err
 	}
-	return userCode, nil
+	return code == code2, nil
 }
 
-// Valid consume user validation code
-func (s *ValidationService) Valid(userID int64) error {
-	_, err := s.db.Exec("UPDATE validations SET used=true WHERE userId=$1", userID)
+// Validate consume user validation code
+func (s *ValidationService) Validate(userID int64, code string) error {
+	_, err := s.db.Exec("UPDATE validations SET used=true WHERE userId=$1 AND code=$2", userID, code)
 	return err
 }

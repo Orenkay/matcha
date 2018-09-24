@@ -75,10 +75,9 @@ func (s *UserService) UserByEmail(email string) (*store.User, error) {
 
 // Add insert given user instance in database
 func (s *UserService) Add(user *store.User) error {
-	r, err := s.db.Exec("INSERT INTO users (email, username, password) VALUES($1,$2,$3)", user.Email, user.Username, user.Password)
+	err := s.db.QueryRow("INSERT INTO users (email, username, password) VALUES($1,$2,$3) RETURNING id", user.Email, user.Username, user.Password).Scan(&user.ID)
 	if err != nil {
 		return err
 	}
-	user.ID, _ = r.LastInsertId()
 	return nil
 }

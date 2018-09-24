@@ -1,6 +1,7 @@
 package api
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/go-chi/render"
@@ -98,6 +99,14 @@ func ErrInternal(err error) render.Renderer {
 		Err:            err,
 		HTTPStatusCode: 500,
 		StatusText:     "Internal server error.",
+	}
+}
+
+func ErrUnauthorized() render.Renderer {
+	return &ErrResponse{
+		Err:            errors.New(""),
+		HTTPStatusCode: 401,
+		StatusText:     "Unauthorized.",
 	}
 }
 

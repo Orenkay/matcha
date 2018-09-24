@@ -90,15 +90,17 @@ func Register(s *store.Store) http.HandlerFunc {
 			return
 		}
 
-		err := s.UserService.Add(&store.User{
+		user := &store.User{
 			Email:    data.Email,
 			Username: data.Username,
 			Password: data.Password,
-		})
+		}
+		err := s.UserService.Add(user)
 		if err != nil {
 			render.Render(w, r, api.ErrInternal(err))
 			return
 		}
+		s.ValidationService.Add(user.ID, "1234")
 		render.Render(w, r, api.CodeResponse(http.StatusCreated))
 	}
 }

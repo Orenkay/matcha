@@ -1,5 +1,7 @@
 package store
 
+import jwt "github.com/dgrijalva/jwt-go"
+
 type User struct {
 	ID       int64  `json:"id"`
 	Email    string `json:"email"`
@@ -25,20 +27,20 @@ type ValidationService interface {
 	// Add create a new column for the given userid with validation code
 	Add(userID int64, code string) error
 
-	// IsUsed check if given user is valided
-	IsUsed(userID int64) (bool, error)
+	// IsValidated check if given user is valided
+	IsValidated(userID int64) (bool, error)
 
-	// Code return validation code associated with the given UserID
-	Code(userID int64) (string, error)
+	// CheckCode check if given code is valid
+	CheckCode(userID int64, code string) (bool, error)
 
-	// Use consume user validation code
-	Valid(userID int64) error
+	// Validate consume user validation code
+	Validate(userID int64, code string) error
 }
 
 type AuthTokenService interface {
-	Add(userID int64, token string) error
-	Delete(token string) error
-	Exists(token string) (bool, error)
+	Add(tokenString string, token *jwt.Token)
+	Delete(tokenString string)
+	Exists(token string) bool
 }
 
 type Store struct {
