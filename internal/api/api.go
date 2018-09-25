@@ -26,7 +26,7 @@ func (resp *TokenResponse) Render(w http.ResponseWriter, r *http.Request) error 
 	return nil
 }
 
-func NewResponse(code int, data interface{}) render.Renderer {
+func NewResponse(data interface{}) render.Renderer {
 	return &Response{
 		HTTPStatusCode: 200,
 		Data:           data,

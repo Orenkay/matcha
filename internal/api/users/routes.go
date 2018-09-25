@@ -13,6 +13,17 @@ import (
 	"github.com/orenkay/matcha/internal/store"
 )
 
+func UserGuard(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		user := r.Context().Value("user")
+		if user == nil {
+			render.Render(w, r, api.ErrUnauthorized())
+			return
+		}
+		next.ServeHTTP(w, r)
+	})
+}
+
 func UserCtx(s *store.Store) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

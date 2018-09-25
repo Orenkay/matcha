@@ -3,12 +3,11 @@ package main
 import (
 	"database/sql"
 
+	_ "github.com/lib/pq"
 	"github.com/orenkay/matcha/internal/server"
 	"github.com/orenkay/matcha/internal/store"
 	"github.com/orenkay/matcha/internal/store/memory"
 	"github.com/orenkay/matcha/internal/store/postgres"
-
-	_ "github.com/lib/pq"
 )
 
 func main() {

@@ -20,9 +20,13 @@ func ComparePassword(hash string, plain string) error {
 	return bcrypt.CompareHashAndPassword([]byte(hash), []byte(plain))
 }
 
-func CreateJWT(claims jwt.Claims) (string, error) {
+func CreateJWT(claims jwt.Claims) (string, *jwt.Token, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	return token.SignedString(tokenSecret)
+	ss, err := token.SignedString(tokenSecret)
+	if err != nil {
+		return "", nil, err
+	}
+	return ss, token, nil
 }
 
 func DecodeJWT(token string) (*jwt.Token, error) {

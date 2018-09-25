@@ -46,14 +46,14 @@ func Authenticate(s *store.Store) http.HandlerFunc {
 		}
 
 		claims := jwt.MapClaims{"userId": user.ID}
-		ss, err := crypto.CreateJWT(claims)
+		ss, token, err := crypto.CreateJWT(claims)
 		{
 			if err != nil {
 				render.Render(w, r, api.ErrInternal(err))
 				return
 			}
 		}
-
+		s.AuthTokenService.Add(ss, token)
 		render.Render(w, r, &api.TokenResponse{Token: ss})
 	}
 }

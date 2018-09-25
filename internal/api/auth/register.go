@@ -1,6 +1,8 @@
 package auth
 
 import (
+	"crypto/rand"
+	"encoding/base64"
 	"net/http"
 
 	"github.com/go-chi/render"
@@ -72,6 +74,15 @@ func canRegisterCheck(s *store.Store, data *RegisterRequest) error {
 	return nil
 }
 
+func generateCode() (string, error) {
+	b := make([]byte, 32)
+	_, err := rand.Read(b)
+	if err != nil {
+		return "", err
+	}
+	return base64.URLEncoding.EncodeToString(b), nil
+}
+
 // Register handle POST /auth/register requests
 func Register(s *store.Store) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -100,7 +111,32 @@ func Register(s *store.Store) http.HandlerFunc {
 			render.Render(w, r, api.ErrInternal(err))
 			return
 		}
-		s.ValidationService.Add(user.ID, "1234")
+
+		code, err := generateCode()
+		{
+			if err != nil {
+				render.Render(w, r, api.ErrInternal(err))
+				return
+			}
+		}
+
+		err = s.ValidationService.Add(user.ID, code)
+		{
+			if err != nil {
+				render.Render(w, r, api.ErrInternal(err))
+				return
+			}
+		}
+
+		// link := r.Host + "/users/" + strconv.Itoa(int(user.ID)) + "/activate/" + code
+		// err = mail.Send(user.Email, "Matcha validation", "<a href='"+link+"'>"+link+"</a>")
+		// {
+		// 	if err != nil {
+		// 		fmt.Println(err)
+		// 		render.Render(w, r, api.ErrInternal(err))
+		// 		return
+		// 	}
+		// }
 		render.Render(w, r, api.CodeResponse(http.StatusCreated))
 	}
 }
