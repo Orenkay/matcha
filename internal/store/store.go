@@ -21,6 +21,13 @@ type Profile struct {
 	Attraction string `json:"attraction"`
 }
 
+type Picture struct {
+	ID     int64  `json:"id"`
+	UserID int64  `json:"-"`
+	Path   string `json:"path"`
+	IsPP   bool   `json:"isPP"`
+}
+
 type Localisation struct {
 	ID      int64   `json:"-"`
 	UserID  int64   `json:"-"`
@@ -55,6 +62,13 @@ type UserService interface {
 
 	Update(user *User) error
 	Remove(user *User) error
+}
+
+type PicturesService interface {
+	Add(p *Picture) error
+	Update(p *Picture) error
+	Delete(id int64) error
+	Pictures(userID int64) ([]*Picture, error)
 }
 
 type ProfileService interface {
@@ -107,6 +121,7 @@ type Store struct {
 	UserService         UserService
 	LocalisationService LocalisationService
 	InterestService     InterestService
+	PicturesService     PicturesService
 	ValidationService   ValidationService
 	AuthTokenService    AuthTokenService
 	ProfileService      ProfileService

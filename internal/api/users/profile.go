@@ -32,11 +32,19 @@ func Profile(s *store.Store) http.HandlerFunc {
 				return
 			}
 		}
+		pictures, err := s.PicturesService.Pictures(user.ID)
+		{
+			if err != nil {
+				render.Render(w, r, api.ErrInternal(err))
+				return
+			}
+		}
 		render.Render(w, r, api.DefaultResponse(http.StatusOK, render.M{
 			"account":   user,
 			"profile":   profile,
 			"loc":       loc,
 			"interests": interests,
+			"pictures":  pictures,
 		}))
 	})
 }

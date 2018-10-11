@@ -2,6 +2,7 @@ package profiles
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 
 	"github.com/go-chi/render"
@@ -51,6 +52,7 @@ func Create(s *store.Store) http.HandlerFunc {
 			Attraction: data.Attraction,
 			Bio:        data.Bio,
 		}
+		fmt.Println(profile)
 		if err := s.ProfileService.Add(profile); err != nil {
 			render.Render(w, r, api.ErrInternal(err))
 			return

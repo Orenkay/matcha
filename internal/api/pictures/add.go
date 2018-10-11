@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
-	"mime"
 	"net/http"
 	"os"
 	"path"
@@ -36,22 +35,13 @@ func Add(s *store.Store) http.HandlerFunc {
 			}
 		}
 
-		// check file type, detectcontenttype only needs the first 512 bytes
 		filetype := http.DetectContentType(fileBytes)
 		switch filetype {
-		case "image/jpeg", "image/jpg", "image/png":
+		case "image/jpeg", "image/jpg":
 			break
 		default:
-			render.Render(w, r, api.ErrInvalidRequest(errors.New("Invalid file type")))
+			render.Render(w, r, api.ErrInvalidRequest(errors.New("Invalid image type, only .jpeg image is accepted")))
 			return
-		}
-
-		fileExt, err := mime.ExtensionsByType(filetype)
-		{
-			if err != nil {
-				render.Render(w, r, api.ErrInternal(err))
-				return
-			}
 		}
 
 		token, err := crypto.RandToken(16)
@@ -61,8 +51,9 @@ func Add(s *store.Store) http.HandlerFunc {
 				return
 			}
 		}
-		filename := path.Join(os.Getenv("MATCHA_PATH"), "assets/uploads", fmt.Sprintf("%d_%s%s", user.ID, token, fileExt[0]))
-		newFile, err := os.Create(filename)
+		filename := fmt.Sprintf("%d_%s", user.ID, token)
+		path := path.Join(os.Getenv("MATCHA_PATH"), "assets/uploads", filename+".jpg")
+		newFile, err := os.Create(path)
 		{
 			if err != nil {
 				render.Render(w, r, api.ErrInternal(err))
@@ -76,6 +67,15 @@ func Add(s *store.Store) http.HandlerFunc {
 			return
 		}
 
-		render.Render(w, r, api.DefaultResponse(http.StatusCreated, nil))
+		p := &store.Picture{
+			UserID: user.ID,
+			Path:   filename,
+			IsPP:   false,
+		}
+		if err := s.PicturesService.Add(p); err != nil {
+			render.Render(w, r, api.ErrInternal(err))
+			return
+		}
+		render.Render(w, r, api.DefaultResponse(http.StatusCreated, p))
 	}
 }

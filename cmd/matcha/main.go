@@ -20,6 +20,7 @@ func main() {
 	store := &store.Store{
 		UserService:         postgres.NewUserService(db),
 		ValidationService:   postgres.NewValidationService(db),
+		PicturesService:     postgres.NewPicturesService(db),
 		InterestService:     postgres.NewInterestService(db),
 		LocalisationService: postgres.NewLocalisationService(db),
 		ProfileService:      postgres.NewProfileService(db),

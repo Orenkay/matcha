@@ -14,5 +14,6 @@ func Routes(s *store.Store) *chi.Mux {
 		r.Use(middlewares.UserMeCtx(s))
 		r.Post("/", Add(s))
 	})
+	router.Get("/{slug}", Serve(s))
 	return router
 }
