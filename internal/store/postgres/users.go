@@ -81,3 +81,18 @@ func (s *UserService) Add(user *store.User) error {
 	}
 	return nil
 }
+
+func (s *UserService) Remove(user *store.User) error {
+	_, err := s.db.Exec("DELETE FROM users WHERE id=$1", user.ID)
+	return err
+}
+
+func (s *UserService) Update(user *store.User) error {
+	_, err := s.db.Exec("UPDATE users SET email=$1, username=$2, password=$3 WHERE id=$4",
+		user.Email,
+		user.Username,
+		user.Password,
+		user.ID,
+	)
+	return err
+}

@@ -1,12 +1,43 @@
 package store
 
-import jwt "github.com/dgrijalva/jwt-go"
+import (
+	jwt "github.com/dgrijalva/jwt-go"
+)
 
 type User struct {
 	ID       int64  `json:"id"`
 	Email    string `json:"email"`
 	Username string `json:"username"`
-	Password string `json:"password"`
+	Password string `json:"-"`
+}
+
+type Profile struct {
+	ID         int64  `json:"-"`
+	UserID     int64  `json:"-"`
+	LastName   string `json:"lastName"`
+	FirstName  string `json:"firstName"`
+	Bio        string `json:"bio"`
+	Gender     string `json:"gender"`
+	Attraction string `json:"attraction"`
+}
+
+type Localisation struct {
+	ID      int64   `json:"-"`
+	UserID  int64   `json:"-"`
+	Lat     float64 `json:"-"`
+	Lng     float64 `json:"-"`
+	Address string  `json:"address"`
+}
+
+type ValidationCode struct {
+	Code string `json:"code"`
+	Used bool   `json:"used"`
+}
+
+type Interest struct {
+	ID     int64  `json:"-"`
+	UserID int64  `json:"-"`
+	Value  string `json:"value"`
 }
 
 type UserService interface {
@@ -21,6 +52,29 @@ type UserService interface {
 
 	// Add insert given user instance in database
 	Add(user *User) error
+
+	Update(user *User) error
+	Remove(user *User) error
+}
+
+type ProfileService interface {
+	Profile(userID int64) (*Profile, error)
+	Add(profile *Profile) error
+	Delete(userId int64) error
+	Update(profile *Profile) error
+}
+
+type LocalisationService interface {
+	Localisation(userID int64) (*Localisation, error)
+	Add(l *Localisation) error
+}
+
+type InterestService interface {
+	Add(interest *Interest) error
+	Remove(userID int64, slug string) error
+	Interest(userID int64, slug string) (*Interest, error)
+	AllBySlug(slug string, limit int) ([]*Interest, error)
+	AllByUser(userID int64) ([]*Interest, error)
 }
 
 type ValidationService interface {
@@ -30,11 +84,17 @@ type ValidationService interface {
 	// IsValidated check if given user is valided
 	IsValidated(userID int64) (bool, error)
 
+	// ValidationCode return the validation column for the given user
+	ValidationCode(userID int64) (*ValidationCode, error)
+
 	// CheckCode check if given code is valid
 	CheckCode(userID int64, code string) (bool, error)
 
 	// Validate consume user validation code
 	Validate(userID int64, code string) error
+
+	// Remove user validation code in database
+	Remove(userID int64) error
 }
 
 type AuthTokenService interface {
@@ -44,7 +104,10 @@ type AuthTokenService interface {
 }
 
 type Store struct {
-	UserService       UserService
-	ValidationService ValidationService
-	AuthTokenService  AuthTokenService
+	UserService         UserService
+	LocalisationService LocalisationService
+	InterestService     InterestService
+	ValidationService   ValidationService
+	AuthTokenService    AuthTokenService
+	ProfileService      ProfileService
 }

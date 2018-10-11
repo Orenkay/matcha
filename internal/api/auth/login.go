@@ -3,6 +3,7 @@ package auth
 import (
 	"errors"
 	"net/http"
+	"time"
 
 	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/go-chi/render"
@@ -45,7 +46,22 @@ func Authenticate(s *store.Store) http.HandlerFunc {
 			}
 		}
 
-		claims := jwt.MapClaims{"userId": user.ID}
+		// validated, err := s.ValidationService.IsValidated(user.ID)
+		// {
+		// 	if err != nil {
+		// 		render.Render(w, r, api.ErrInternal(err))
+		// 		return
+		// 	}
+		// 	if !validated {
+		// 		render.Render(w, r, api.ErrInvalidRequest(errors.New("You must validate your account")))
+		// 		return
+		// 	}
+		// }
+
+		claims := jwt.MapClaims{
+			"userId": user.ID,
+			"exp":    time.Now().Add(time.Minute * 60).Unix(),
+		}
 		ss, token, err := crypto.CreateJWT(claims)
 		{
 			if err != nil {

@@ -24,6 +24,11 @@
 #   go-tests = true
 #   unused-packages = true
 
+
+[[override]]
+  source = "https://github.com/fsnotify/fsnotify/archive/v1.4.7.tar.gz"
+  name = "gopkg.in/fsnotify.v1"
+
 [[constraint]]
   name = "github.com/dgrijalva/jwt-go"
   version = "3.2.0"
@@ -47,10 +52,6 @@
 [prune]
   go-tests = true
   unused-packages = true
-
-[[constraint]]
-  name = "github.com/go-gomail/gomail"
-  version = "2.0.0"
 
 [[constraint]]
   name = "gopkg.in/mailgun/mailgun-go.v1"

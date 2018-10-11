@@ -1,6 +1,8 @@
 package crypto
 
 import (
+	"crypto/rand"
+	"encoding/base64"
 	"fmt"
 
 	jwt "github.com/dgrijalva/jwt-go"
@@ -36,4 +38,13 @@ func DecodeJWT(token string) (*jwt.Token, error) {
 		}
 		return tokenSecret, nil
 	})
+}
+
+func RandToken(size int) (string, error) {
+	b := make([]byte, size)
+	_, err := rand.Read(b)
+	if err != nil {
+		return "", err
+	}
+	return base64.URLEncoding.EncodeToString(b), nil
 }

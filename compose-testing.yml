@@ -12,7 +12,7 @@ services:
     image: matcha
     volumes:
       - .:/go/src/github.com/orenkay/matcha
-    entrypoint: go test ./...
+    entrypoint: ginkgo
     links:
       - postgres
     ports:

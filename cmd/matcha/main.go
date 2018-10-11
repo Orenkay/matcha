@@ -18,9 +18,12 @@ func main() {
 	defer db.Close()
 
 	store := &store.Store{
-		UserService:       postgres.NewUserService(db),
-		ValidationService: postgres.NewValidationService(db),
-		AuthTokenService:  memory.NewAuthTokenService(),
+		UserService:         postgres.NewUserService(db),
+		ValidationService:   postgres.NewValidationService(db),
+		InterestService:     postgres.NewInterestService(db),
+		LocalisationService: postgres.NewLocalisationService(db),
+		ProfileService:      postgres.NewProfileService(db),
+		AuthTokenService:    memory.NewAuthTokenService(),
 	}
 
 	server := server.New(store)

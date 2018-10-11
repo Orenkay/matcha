@@ -2,10 +2,20 @@ package api
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 
 	"github.com/go-chi/render"
 )
+
+type TokenResponse struct {
+	Token string `json:"token"`
+}
+
+func (resp *TokenResponse) Render(w http.ResponseWriter, r *http.Request) error {
+	render.Status(r, 200)
+	return nil
+}
 
 type Response struct {
 	HTTPStatusCode int         `json:"-"`
@@ -17,25 +27,10 @@ func (resp *Response) Render(w http.ResponseWriter, r *http.Request) error {
 	return nil
 }
 
-type TokenResponse struct {
-	Token string `json:"token"`
-}
-
-func (resp *TokenResponse) Render(w http.ResponseWriter, r *http.Request) error {
-	render.Status(r, 200)
-	return nil
-}
-
-func NewResponse(data interface{}) render.Renderer {
-	return &Response{
-		HTTPStatusCode: 200,
-		Data:           data,
-	}
-}
-
-func CodeResponse(code int) render.Renderer {
+func DefaultResponse(code int, data interface{}) render.Renderer {
 	return &Response{
 		HTTPStatusCode: code,
+		Data:           data,
 	}
 }
 
@@ -95,6 +90,7 @@ func ErrInvalidRequest(err error) render.Renderer {
 }
 
 func ErrInternal(err error) render.Renderer {
+	fmt.Println(err.Error())
 	return &ErrResponse{
 		Err:            err,
 		HTTPStatusCode: 500,
@@ -102,20 +98,30 @@ func ErrInternal(err error) render.Renderer {
 	}
 }
 
-func ErrUnauthorized() render.Renderer {
+func ErrAuthenticate() render.Renderer {
 	return &ErrResponse{
 		Err:            errors.New(""),
 		HTTPStatusCode: 401,
-		StatusText:     "Unauthorized.",
+		StatusText:     "Unauthorized place. You need to provide an auth token.",
+	}
+}
+
+func ErrUnauthorized(err error) render.Renderer {
+	return &ErrResponse{
+		Err:            err,
+		HTTPStatusCode: 403,
+		StatusText:     err.Error(),
 	}
 }
 
 func ErrValidation(err error) render.Renderer {
-	ve := err.(*ValidationError)
-	return &ErrResponse{
-		Err:            err,
-		HTTPStatusCode: 400,
-		StatusText:     "Invalid query parameters.",
-		Data:           ve,
+	if ve, ok := err.(*ValidationError); ok {
+		return &ErrResponse{
+			Err:            err,
+			HTTPStatusCode: 400,
+			StatusText:     "Invalid query parameters.",
+			Data:           ve,
+		}
 	}
+	return ErrInternal(err)
 }

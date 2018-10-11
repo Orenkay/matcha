@@ -22,7 +22,7 @@ func Validate(s *store.Store) http.HandlerFunc {
 				return
 			}
 			if validated {
-				render.Render(w, r, api.NewResponse("account is already activated"))
+				render.Render(w, r, api.ErrInvalidRequest(errors.New("account is already activated")))
 				return
 			}
 		}

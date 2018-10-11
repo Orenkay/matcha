@@ -1,13 +1,12 @@
 package auth
 
 import (
-	"crypto/rand"
-	"encoding/base64"
 	"net/http"
 
 	"github.com/go-chi/render"
 	"github.com/orenkay/matcha/internal/api"
 	"github.com/orenkay/matcha/internal/crypto"
+	"github.com/orenkay/matcha/internal/localisation"
 	"github.com/orenkay/matcha/internal/store"
 )
 
@@ -15,6 +14,7 @@ type RegisterRequest struct {
 	Email    string `json:"email"`
 	Username string `json:"user"`
 	Password string `json:"pass"`
+	Loc      *localisation.Place
 }
 
 func (data *RegisterRequest) Bind(r *http.Request) error {
@@ -22,11 +22,11 @@ func (data *RegisterRequest) Bind(r *http.Request) error {
 	ve.Validation.Source = "register"
 
 	if len(data.Username) < 4 || len(data.Username) > 32 {
-		ve.Add("username", "Username length must be between 4 and 32 included.")
+		ve.Add("user", "Username length must be between 4 and 32 included.")
 	}
 
 	if len(data.Password) < 4 || len(data.Password) > 32 {
-		ve.Add("password", "Password length must be between 4 and 32 included.")
+		ve.Add("pass", "Password length must be between 4 and 32 included.")
 	}
 
 	if ve.Len() > 0 {
@@ -34,6 +34,11 @@ func (data *RegisterRequest) Bind(r *http.Request) error {
 	}
 
 	pass, err := crypto.EncryptPassword(data.Password)
+	if err != nil {
+		return err
+	}
+
+	data.Loc, err = localisation.PlaceByIP(r.RemoteAddr)
 	if err != nil {
 		return err
 	}
@@ -63,7 +68,7 @@ func canRegisterCheck(s *store.Store, data *RegisterRequest) error {
 			return err
 		}
 		if user != nil {
-			ve.Add("username", "Already taken")
+			ve.Add("user", "Already taken")
 		}
 	}
 
@@ -72,15 +77,6 @@ func canRegisterCheck(s *store.Store, data *RegisterRequest) error {
 	}
 
 	return nil
-}
-
-func generateCode() (string, error) {
-	b := make([]byte, 32)
-	_, err := rand.Read(b)
-	if err != nil {
-		return "", err
-	}
-	return base64.URLEncoding.EncodeToString(b), nil
 }
 
 // Register handle POST /auth/register requests
@@ -112,31 +108,22 @@ func Register(s *store.Store) http.HandlerFunc {
 			return
 		}
 
-		code, err := generateCode()
-		{
-			if err != nil {
-				render.Render(w, r, api.ErrInternal(err))
-				return
-			}
-		}
-
-		err = s.ValidationService.Add(user.ID, code)
-		{
-			if err != nil {
-				render.Render(w, r, api.ErrInternal(err))
-				return
-			}
-		}
-
-		// link := r.Host + "/users/" + strconv.Itoa(int(user.ID)) + "/activate/" + code
-		// err = mail.Send(user.Email, "Matcha validation", "<a href='"+link+"'>"+link+"</a>")
-		// {
-		// 	if err != nil {
-		// 		fmt.Println(err)
-		// 		render.Render(w, r, api.ErrInternal(err))
-		// 		return
-		// 	}
+		// err = s.LocalisationService.Add(&store.Localisation{
+		// 	UserID:  user.ID,
+		// 	Lat:     data.Loc.Lat,
+		// 	Lng:     data.Loc.Lng,
+		// 	Address: data.Loc.Address,
+		// })
+		// if err != nil {
+		// 	render.Render(w, r, api.ErrInternal(err))
+		// 	return
 		// }
-		render.Render(w, r, api.CodeResponse(http.StatusCreated))
+
+		// err = mail.SendValidationMail(r, s, user)
+		// if err != nil {
+		// 	render.Render(w, r, api.ErrInternal(err))
+		// 	return
+		// }
+		render.Render(w, r, api.DefaultResponse(http.StatusCreated, nil))
 	}
 }

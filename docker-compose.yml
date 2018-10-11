@@ -23,6 +23,8 @@ services:
   matcha:
     build: .
     image: matcha
+    volumes:
+      - .:/go/src/github.com/orenkay/matcha
     entrypoint: go run ./cmd/matcha/main.go
     links:
       - postgres

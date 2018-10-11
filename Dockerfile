@@ -1,10 +1,12 @@
 FROM golang:latest
 
-COPY . /go/src/github.com/orenkay/matcha
-WORKDIR /go/src/github.com/orenkay/matcha
+ENV MATCHA_PATH  /go/src/github.com/orenkay/matcha
 
-RUN apt-get update
-RUN apt-get install -y sendmail
+COPY . ${MATCHA_PATH}
+WORKDIR ${MATCHA_PATH}
+
+RUN go get -u github.com/onsi/ginkgo/ginkgo
+RUN go get -u github.com/onsi/gomega/...
 
 RUN go get -u github.com/golang/dep/cmd/dep
 RUN dep ensure
