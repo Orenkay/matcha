@@ -8,6 +8,7 @@ import (
 	"github.com/orenkay/matcha/internal/crypto"
 	"github.com/orenkay/matcha/internal/localisation"
 	"github.com/orenkay/matcha/internal/store"
+	"github.com/orenkay/matcha/internal/validations"
 )
 
 type RegisterRequest struct {
@@ -21,13 +22,8 @@ func (data *RegisterRequest) Bind(r *http.Request) error {
 	ve := &api.ValidationError{}
 	ve.Validation.Source = "register"
 
-	if len(data.Username) < 4 || len(data.Username) > 32 {
-		ve.Add("user", "Username length must be between 4 and 32 included.")
-	}
-
-	if len(data.Password) < 4 || len(data.Password) > 32 {
-		ve.Add("pass", "Password length must be between 4 and 32 included.")
-	}
+	validations.Username(ve, data.Username)
+	validations.Password(ve, data.Password)
 
 	if ve.Len() > 0 {
 		return ve
@@ -37,44 +33,13 @@ func (data *RegisterRequest) Bind(r *http.Request) error {
 	if err != nil {
 		return err
 	}
-
-	data.Loc, err = localisation.PlaceByIP(r.RemoteAddr)
-	if err != nil {
-		return err
-	}
-
 	data.Password = string(pass)
-	return nil
-}
 
-func canRegisterCheck(s *store.Store, data *RegisterRequest) error {
-	ve := &api.ValidationError{}
-
-	// We check if email is already taken
-	user, err := s.UserService.UserByEmail(data.Email)
-	{
-		if err != nil {
-			return err
-		}
-		if user != nil {
-			ve.Add("email", "Already taken")
-		}
-	}
-
-	// We check if username is already taken
-	user, err = s.UserService.UserByName(data.Username)
-	{
-		if err != nil {
-			return err
-		}
-		if user != nil {
-			ve.Add("user", "Already taken")
-		}
-	}
-
-	if ve.Len() > 0 {
-		return ve
-	}
+	// Locate user by his IP: IDK if i should keep it since now we ask for user location
+	// data.Loc, err = localisation.PlaceByIP(r.RemoteAddr)
+	// if err != nil {
+	// 	return err
+	// }
 
 	return nil
 }
@@ -88,15 +53,15 @@ func Register(s *store.Store) http.HandlerFunc {
 			return
 		}
 
-		if err := canRegisterCheck(s, data); err != nil {
-			if err, ok := err.(*api.ValidationError); ok {
-				render.Render(w, r, api.ErrValidation(err))
+		ve := &api.ValidationError{}
+		{
+			validations.EmailTaken(ve, s.UserService, data.Email)
+			validations.UsernameTaken(ve, s.UserService, data.Username)
+			if ve.Len() > 0 {
+				render.Render(w, r, api.ErrValidation(ve))
 				return
 			}
-			render.Render(w, r, api.ErrInternal(err))
-			return
 		}
-
 		user := &store.User{
 			Email:    data.Email,
 			Username: data.Username,

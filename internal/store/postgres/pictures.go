@@ -81,6 +81,17 @@ func (s *PicturesService) DeleteByPath(path string) error {
 	return err
 }
 
+func (s *PicturesService) PicturesCount(userID int64) (int, error) {
+	var count int
+	err := s.db.QueryRow("SELECT COUNT(*) as count FROM pictures WHERE userId=$1", userID).Scan(&count)
+	{
+		if err != nil {
+			return 0, err
+		}
+	}
+	return count, nil
+}
+
 func (s *PicturesService) Pictures(userID int64) ([]*store.Picture, error) {
 	var pictures []*store.Picture
 	rows, err := s.db.Query("SELECT * FROM pictures WHERE userId=$1 ORDER BY id ASC", userID)

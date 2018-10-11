@@ -7,7 +7,7 @@
       <b-step-item title="Your Interests" :next="step2next">
         <user-interests :editable="true" :tags="userData.interests" />
       </b-step-item>
-      <b-step-item title="Your Pictures">
+      <b-step-item title="Your Pictures" :next="step3next">
         <user-pictures :editable="true" :pictures="userData.pictures" />
       </b-step-item>
       <!-- <b-step-item title="Your Location">
@@ -61,6 +61,12 @@ export default {
     step2next(next) {
       if (this.userData.interests.length === 0) {
         return this.$toast.open({message:"You must add atleast one interest", queue: false, type: "is-danger"});
+      }
+      next();
+    },
+    step3next(next) {
+      if (this.userData.pictures.findIndex(p => p.isPP) < 0) {
+        return this.$toast.open({message:"You must have atleast one PP", queue: false, type: "is-danger"});
       }
       next();
     }

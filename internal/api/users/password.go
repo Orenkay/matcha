@@ -55,6 +55,7 @@ func EditPassword(s *store.Store) http.HandlerFunc {
 			render.Render(w, r, api.ErrInternal(err))
 			return
 		}
+		s.AuthTokenService.Delete(r.Header.Get("X-Auth-Token"))
 		render.Render(w, r, api.DefaultResponse(http.StatusOK, nil))
 	})
 }

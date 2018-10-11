@@ -55,8 +55,9 @@ type ValidationErrorDetail struct {
 }
 
 type ValidationError struct {
-	errors     int `json:"-"`
-	Validation struct {
+	errors        int `json:"-"`
+	internalError *error
+	Validation    struct {
 		Details []ValidationErrorDetail `json:"details"`
 		Source  string                  `json:"source"`
 		Keys    []string                `json:"keys"`
@@ -74,6 +75,11 @@ func (e *ValidationError) Add(path string, message string) {
 
 func (e *ValidationError) Len() int {
 	return e.errors
+}
+
+func (e *ValidationError) InternalError(err error) {
+	e.errors++
+	e.internalError = &err
 }
 
 func (e *ValidationError) Error() string {
@@ -116,6 +122,9 @@ func ErrUnauthorized(err error) render.Renderer {
 
 func ErrValidation(err error) render.Renderer {
 	if ve, ok := err.(*ValidationError); ok {
+		if ve.internalError != nil {
+			return ErrInternal(*ve.internalError)
+		}
 		return &ErrResponse{
 			Err:            err,
 			HTTPStatusCode: 400,

@@ -40,10 +40,19 @@ export default {
       formData.append("picture", file[0]);
       this.$http
         .post("/pictures/me", formData, {
+          errorHandle: false,
           "Content-Type": "multipart/form-data"
         })
         .then(res => {
           this.$store.commit('addPicture', res.data.data)
+        })
+        .catch(err => {
+          if (err.response && err.response.status === 400) {
+            this.$toast.open({
+              message: err.response.data.error,
+              type: "is-danger"
+            })
+          }
         });
     },
     remove(id) {

@@ -4,6 +4,8 @@ import (
 	"errors"
 	"net/http"
 
+	"github.com/orenkay/matcha/internal/validations"
+
 	"github.com/go-chi/render"
 	"github.com/orenkay/matcha/internal/api"
 	"github.com/orenkay/matcha/internal/crypto"
@@ -17,8 +19,11 @@ type AccountEditRequest struct {
 }
 
 func (data *AccountEditRequest) Bind(r *http.Request) error {
-	// ve := &api.ValidationError{}
-	// ve.Validation.Source = "AccountEdit"
+	ve := &api.ValidationError{}
+	ve.Validation.Source = "AccountEdit"
+
+	validations.Username(ve, data.Username)
+
 	return nil
 }
 
@@ -37,12 +42,29 @@ func EditAccount(s *store.Store) http.HandlerFunc {
 			return
 		}
 
+		// Here we check if new username / email is already taken
+		ve := &api.ValidationError{}
+		{
+			ve.Validation.Source = "AccountEdit"
+			if user.Username != data.Username {
+				validations.UsernameTaken(ve, s.UserService, data.Username)
+			}
+			if user.Email != data.Email {
+				validations.EmailTaken(ve, s.UserService, data.Email)
+			}
+			if ve.Len() > 0 {
+				render.Render(w, r, api.ErrValidation(ve))
+				return
+			}
+		}
+
 		user.Email = data.Email
 		user.Username = data.Username
 		if err := s.UserService.Update(user); err != nil {
 			render.Render(w, r, api.ErrInternal(err))
 			return
 		}
+		s.AuthTokenService.Delete(r.Header.Get("X-Auth-Token"))
 		render.Render(w, r, api.DefaultResponse(http.StatusOK, nil))
 	})
 }

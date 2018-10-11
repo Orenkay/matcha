@@ -18,6 +18,18 @@ func Add(s *store.Store) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		user := r.Context().Value("user").(*store.User)
 
+		count, err := s.PicturesService.PicturesCount(user.ID)
+		{
+			if err != nil {
+				render.Render(w, r, api.ErrInternal(err))
+				return
+			}
+			if count == 5 {
+				render.Render(w, r, api.ErrInvalidRequest(errors.New("You can't upload more pictures (max 5)")))
+				return
+			}
+		}
+
 		file, _, err := r.FormFile("picture")
 		{
 			if err != nil {

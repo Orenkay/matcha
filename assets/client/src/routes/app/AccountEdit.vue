@@ -2,7 +2,7 @@
   <div>
     <b-tabs>
       <b-tab-item label="Basic">
-        <personal-form ref="form" />
+        <account-form ref="form" />
         <br />
         <button class="button is-black" @click="submit">Edit</button>
       </b-tab-item>
@@ -18,11 +18,11 @@
 </template>
 
 <script>
-import PersonalForm from "../../components/forms/PersonalForm";
+import AccountForm from "../../components/forms/AccountForm";
 import PassEditForm from "../../components/forms/PassEditForm";
 export default {
   components: {
-    PersonalForm,
+    AccountForm,
     PassEditForm
   },
   methods: {
@@ -34,14 +34,24 @@ export default {
             .patch("/users/me/", data, { errorHandle: false })
             .then(res => {
               this.$toast.open("Account informations successfuly edited");
-              this.$store.dispatch("logout");
+              this.$store.commit("logout");
             })
             .catch(err => {
               if (err.response && err.response.status === 400) {
-                this.$toast.open({
-                  message: err.response.data.error,
-                  type: "is-danger"
-                });
+                const { data } = err.response.data;
+                if (data.validation !== undefined) {
+                  data.validation.keys.forEach((k, i) => {
+                    this.$refs.form.fieldError(
+                      k,
+                      data.validation.details[i].message
+                    );
+                  });
+                } else {
+                  this.$toast.open({
+                    message: data.error,
+                    type: "is-danger"
+                  });
+                }
               }
             });
         });
@@ -56,7 +66,7 @@ export default {
             .patch("/users/me/password", data, { errorHandle: false })
             .then(res => {
               this.$toast.open("Password changed");
-              this.$store.dispatch("logout");
+              this.$store.commit("logout");
             })
             .catch(err => {
               if (err.response && err.response.status === 400) {
@@ -78,7 +88,7 @@ export default {
         onConfirm: pass => {
           this.$http.delete("/users/me/" + pass).then(res => {
             this.$toast.open("Account deleted");
-            this.$store.dispatch("logout");
+            this.$store.commit("logout");
           });
         }
       });

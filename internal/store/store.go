@@ -70,6 +70,7 @@ type PicturesService interface {
 	Delete(userID, id int64) error
 	DeleteByPath(path string) error
 	Pictures(userID int64) ([]*Picture, error)
+	PicturesCount(userID int64) (int, error)
 	Picture(userID, id int64) (*Picture, error)
 	PP(userID int64) (*Picture, error)
 }
