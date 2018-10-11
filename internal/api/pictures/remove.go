@@ -40,9 +40,10 @@ func Remove(s *store.Store) http.HandlerFunc {
 			render.Render(w, r, api.ErrInternal(err))
 			return
 		}
-
-		// here we dont handle error: see https://github.com/Orenkay/matcha/blob/master/internal/api/pictures/serve.go#L25
-		os.Remove(path.Join(os.Getenv("MATCHA_PATH"), "assets/uploads", p.Path+".jpg"))
+		if err := os.Remove(path.Join(os.Getenv("MATCHA_PATH"), "assets/uploads", p.Path+".jpg")); err != nil {
+			render.Render(w, r, api.ErrInternal(err))
+			return
+		}
 		render.Render(w, r, api.DefaultResponse(http.StatusOK, nil))
 	}
 }
