@@ -10,9 +10,9 @@
       <b-step-item title="Your Pictures" :next="step3next">
         <user-pictures :editable="true" :pictures="userData.pictures" />
       </b-step-item>
-      <!-- <b-step-item title="Your Location">
-        <user-location :editable="true" />
-      </b-step-item> -->
+      <b-step-item title="Your Location" :next="step4next">
+        <location-form ref="locForm" />
+      </b-step-item>
       <b-step-item title="Done!">
         <div class="has-text-centered">
           <h1 class="title">Welcome in Matcha !</h1>
@@ -25,12 +25,14 @@
 
 <script>
 import PersonalForm from "../../components/forms/PersonalForm";
+import LocationForm from "../../components/forms/LocationForm";
 import UserPictures from "../../components/UserPictures";
 import UserInterests from "../../components/UserInterests";
 
 export default {
   components: {
     PersonalForm,
+    LocationForm,
     UserPictures,
     UserInterests
   },
@@ -51,7 +53,7 @@ export default {
         const req =
           this.$store.getters.profile.lastName === undefined
             ? this.$http.post("/profiles", data)
-            : this.$http.put("/profiles/edit", data);
+            : this.$http.patch("/profiles/edit", data);
         req.then(res => {
           this.$store.commit("setUserData", ["profile", res.data.data]);
           next();
@@ -69,6 +71,18 @@ export default {
         return this.$toast.open({message:"You must have atleast one PP", queue: false, type: "is-danger"});
       }
       next();
+    },
+    step4next(next) {
+      this.$refs.locForm.submit(data => {
+        const req=
+          this.$store.getters.loc.address === undefined
+              ? this.$http.post("/loc/me", {placeId: data.place_id})
+              : this.$http.patch("/loc/me/edit", {placeId: data.place_id});
+        req.then(res => {
+          this.$store.commit("setUserData", ["loc", res.data.data]);
+          next();
+        });
+      })
     }
   }
 };

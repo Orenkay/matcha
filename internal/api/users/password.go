@@ -50,6 +50,11 @@ func EditPassword(s *store.Store) http.HandlerFunc {
 			return
 		}
 
+		if user.Password == data.Password {
+			render.Render(w, r, api.ErrInvalidRequest(errors.New("Nothing to edit")))
+			return
+		}
+
 		user.Password = data.Password
 		if err := s.UserService.Update(user); err != nil {
 			render.Render(w, r, api.ErrInternal(err))

@@ -10,6 +10,7 @@ import (
 	"github.com/go-chi/render"
 	"github.com/orenkay/matcha/internal/api/auth"
 	"github.com/orenkay/matcha/internal/api/interests"
+	"github.com/orenkay/matcha/internal/api/localisations"
 	"github.com/orenkay/matcha/internal/api/pictures"
 	"github.com/orenkay/matcha/internal/api/profiles"
 	"github.com/orenkay/matcha/internal/api/users"
@@ -44,6 +45,7 @@ func New(store *store.Store) *Server {
 	router.Mount("/profiles", profiles.Routes(store))
 	router.Mount("/interests", interests.Routes(store))
 	router.Mount("/pictures", pictures.Routes(store))
+	router.Mount("/loc", localisations.Routes(store))
 
 	return &Server{
 		store:  store,

@@ -38,12 +38,12 @@ export default {
             })
             .catch(err => {
               if (err.response && err.response.status === 400) {
-                const { data } = err.response.data;
-                if (data.validation !== undefined) {
-                  data.validation.keys.forEach((k, i) => {
+                const { data } = err.response;
+                if (data.data && data.data.validation !== undefined) {
+                  data.data.validation.keys.forEach((k, i) => {
                     this.$refs.form.fieldError(
                       k,
-                      data.validation.details[i].message
+                      data.data.validation.details[i].message
                     );
                   });
                 } else {
@@ -86,9 +86,11 @@ export default {
           type: "password"
         },
         onConfirm: pass => {
-          this.$http.delete("/users/me/" + pass).then(res => {
+          this.$http.delete("/users/me/" + pass, { errorHandle: false}).then(res => {
             this.$toast.open("Account deleted");
             this.$store.commit("logout");
+          }).catch(err => {
+            this.$toast.open(err.response.data.error)
           });
         }
       });

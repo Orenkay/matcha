@@ -1,4 +1,4 @@
-package profiles
+package localisations
 
 import (
 	"github.com/go-chi/chi"
@@ -10,10 +10,10 @@ func Routes(s *store.Store) *chi.Mux {
 	router := chi.NewRouter()
 	router.Use(middlewares.AuthTokenCtx(s))
 
-	router.Route("/", func(r chi.Router) {
+	router.Route("/me", func(r chi.Router) {
 		r.Use(middlewares.UserMeCtx(s))
-		r.Post("/", Create(s))
-		r.Patch("/edit", Edit(s))
+		r.Post("/", Add(s))
+		r.Patch("/edit", Update(s))
 	})
 	return router
 }

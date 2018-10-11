@@ -58,6 +58,12 @@ func EditAccount(s *store.Store) http.HandlerFunc {
 			}
 		}
 
+		// if there is nothing to update, we stop here
+		if user.Email == data.Email && user.Username == data.Username {
+			render.Render(w, r, api.ErrInvalidRequest(errors.New("Nothing to edit")))
+			return
+		}
+
 		user.Email = data.Email
 		user.Username = data.Username
 		if err := s.UserService.Update(user); err != nil {

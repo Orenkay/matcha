@@ -38,6 +38,16 @@ func (s *LocalisationService) Add(l *store.Localisation) error {
 	).Scan(&l.ID)
 }
 
+func (s *LocalisationService) Update(l *store.Localisation) error {
+	_, err := s.db.Exec("UPDATE localisations SET lat=$1, lng=$2, address=$3 WHERE userId=$4",
+		&l.Lat,
+		&l.Lng,
+		&l.Address,
+		&l.UserID,
+	)
+	return err
+}
+
 func (s *LocalisationService) Localisation(userID int64) (*store.Localisation, error) {
 	loc := &store.Localisation{}
 	err := s.db.QueryRow("SELECT * FROM localisations WHERE userId=$1", userID).Scan(

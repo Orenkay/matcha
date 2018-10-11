@@ -85,6 +85,7 @@ type ProfileService interface {
 type LocalisationService interface {
 	Localisation(userID int64) (*Localisation, error)
 	Add(l *Localisation) error
+	Update(l *Localisation) error
 }
 
 type InterestService interface {

@@ -67,7 +67,7 @@ func PlaceByIP(ip string) (*Place, error) {
 }
 
 func PlaceByID(placeID string) (*Place, error) {
-	resp, err := http.Get("https://maps.googleapis.com/maps/api/place/details/json?placeid=" + placeID + "&fields=name,rating,formatted_phone_number&key=" + googleAPIKey)
+	resp, err := http.Get("https://maps.googleapis.com/maps/api/place/details/json?placeid=" + placeID + "&fields=formatted_address,geometry&key=" + googleAPIKey)
 	if err != nil {
 		return nil, err
 	}
@@ -81,8 +81,8 @@ func PlaceByID(placeID string) (*Place, error) {
 	}
 
 	return &Place{
-		Lat: d.Result.Geometry.Location.Lat,
-		Lng: d.Result.Geometry.Location.Lng,
-		// PlaceID: d.Result.PlaceID,
+		Lat:     d.Result.Geometry.Location.Lat,
+		Lng:     d.Result.Geometry.Location.Lng,
+		Address: d.Result.Address,
 	}, nil
 }
