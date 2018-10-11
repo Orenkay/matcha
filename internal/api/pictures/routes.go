@@ -13,6 +13,8 @@ func Routes(s *store.Store) *chi.Mux {
 	router.Route("/me", func(r chi.Router) {
 		r.Use(middlewares.UserMeCtx(s))
 		r.Post("/", Add(s))
+		r.Delete("/{id}", Remove(s))
+		r.Patch("/{id}/pp", UpdatePP(s))
 	})
 	router.Get("/{slug}", Serve(s))
 	return router

@@ -62,8 +62,8 @@ func (s *ProfileService) Add(profile *store.Profile) error {
 	).Scan(&profile.ID)
 }
 
-func (s *ProfileService) Delete(userId int64) error {
-	return s.db.QueryRow("DELETE FROM profiles WHERE userId=$1", userId).Scan()
+func (s *ProfileService) Delete(userID int64) error {
+	return s.db.QueryRow("DELETE FROM profiles WHERE userId=$1", userID).Scan()
 }
 
 func (s *ProfileService) Update(profile *store.Profile) error {

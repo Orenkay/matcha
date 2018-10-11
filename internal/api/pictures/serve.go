@@ -1,6 +1,7 @@
 package pictures
 
 import (
+	"errors"
 	"io"
 	"net/http"
 	"os"
@@ -19,6 +20,12 @@ func Serve(s *store.Store) http.HandlerFunc {
 		filename := path.Join(os.Getenv("MATCHA_PATH"), "assets/uploads", image+".jpg")
 		img, err := os.Open(filename)
 		{
+			if os.IsNotExist(err) {
+				render.Render(w, r, api.ErrInvalidRequest(errors.New("requested image doesnt exist")))
+				// Here we try to cleanup database from corrupted file
+				s.PicturesService.DeleteByPath(image)
+				return
+			}
 			if err != nil {
 				render.Render(w, r, api.ErrInternal(err))
 				return

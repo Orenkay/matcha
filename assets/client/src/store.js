@@ -47,11 +47,11 @@ const store = new Vuex.Store({
             const data = res.data.data
             store.state.loaded = true
 
-            console.log(data)
             store.commit('setUserData', ['account', data.account])
             store.commit('setUserData', ['profile', data.profile])
             store.commit('setUserData', ['loc', data.loc])
             store.commit('setUserData', ['interests', data.interests])
+            store.commit('setUserData', ['pictures', data.pictures])
 
             resolve()
           })
@@ -135,6 +135,22 @@ const store = new Vuex.Store({
       if (v !== null) {
         state.userData[k] = v
       }
+    },
+    addPicture: (state, pic) => {
+      state.userData.pictures.push(pic)
+    },
+    removePicture: (state, id) => {
+      const index = state.userData.pictures.findIndex(p => p.id === id)
+      if (index >= 0) {
+        state.userData.pictures.splice(index, 1)
+      }
+    },
+    setPP: (state, id) => {
+      const pp = state.userData.pictures.find(p => p.isPP)
+      const newPP = state.userData.pictures.find(p => p.id === id)
+
+      pp && (pp.isPP = false)
+      newPP && (newPP.isPP = true)
     },
     setError: (state, err) => {
       state.error = err

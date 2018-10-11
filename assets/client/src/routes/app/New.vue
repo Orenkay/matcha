@@ -8,7 +8,7 @@
         <user-interests :editable="true" :tags="userData.interests" />
       </b-step-item>
       <b-step-item title="Your Pictures">
-        <user-pictures :editable="true" :pictures="[{id: 0, url: 'https://bulma.io/images/placeholders/128x128.png'}]" />
+        <user-pictures :editable="true" :pictures="userData.pictures" />
       </b-step-item>
       <!-- <b-step-item title="Your Location">
         <user-location :editable="true" />
@@ -42,7 +42,7 @@ export default {
       if (this.userData.profile.lastName === undefined) return 0;
       if (this.userData.interests.length === 0) return 1;
       if (this.userData.pictures.length === 0) return 2;
-      if (this.userData.loc.address === undefined) return 0;
+      if (this.userData.loc.address === undefined) return 3;
     }
   },
   methods: {
@@ -53,14 +53,14 @@ export default {
             ? this.$http.post("/profiles", data)
             : this.$http.put("/profiles/edit", data);
         req.then(res => {
-          this.$store.commit("setUserData", "profile", res.data.data);
+          this.$store.commit("setUserData", ["profile", res.data.data]);
           next();
         });
       });
     },
     step2next(next) {
       if (this.userData.interests.length === 0) {
-        return this.$toast.open("You must add atleast one interest");
+        return this.$toast.open({message:"You must add atleast one interest", queue: false, type: "is-danger"});
       }
       next();
     }

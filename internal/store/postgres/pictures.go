@@ -37,14 +37,53 @@ func (s *PicturesService) Update(p *store.Picture) error {
 	return err
 }
 
-func (s *PicturesService) Delete(id int64) error {
-	_, err := s.db.Exec("DELETE FROM pictures WHERE id=$1", id)
+func (s *PicturesService) Picture(userID, id int64) (*store.Picture, error) {
+	p := &store.Picture{}
+	err := s.db.QueryRow("SELECT * FROM pictures WHERE id=$1 AND userId=$2", id, userID).Scan(
+		&p.ID,
+		&p.UserID,
+		&p.Path,
+		&p.IsPP,
+	)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
+		return nil, err
+	}
+	return p, nil
+}
+
+func (s *PicturesService) PP(userID int64) (*store.Picture, error) {
+	p := &store.Picture{}
+	err := s.db.QueryRow("SELECT * FROM pictures WHERE userId=$1 AND isPP=$2", userID, true).Scan(
+		&p.ID,
+		&p.UserID,
+		&p.Path,
+		&p.IsPP,
+	)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
+		return nil, err
+	}
+	return p, nil
+}
+
+func (s *PicturesService) Delete(userID, id int64) error {
+	_, err := s.db.Exec("DELETE FROM pictures WHERE id=$1 AND userId=$2", id, userID)
+	return err
+}
+
+func (s *PicturesService) DeleteByPath(path string) error {
+	_, err := s.db.Exec("DELETE FROM pictures WHERE path=$1", path)
 	return err
 }
 
 func (s *PicturesService) Pictures(userID int64) ([]*store.Picture, error) {
 	var pictures []*store.Picture
-	rows, err := s.db.Query("SELECT * FROM pictures WHERE userId=$1", userID)
+	rows, err := s.db.Query("SELECT * FROM pictures WHERE userId=$1 ORDER BY id ASC", userID)
 	{
 		if err != nil {
 			return nil, err

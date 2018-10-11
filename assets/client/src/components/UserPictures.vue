@@ -1,15 +1,18 @@
 <template>
   <div>
     <div class="has-text-centered">
-      <figure v-for="(pic, index) in pictures" :key="index" class="image is-128x128">
-        <div class="edit-overlay image is-128x128">
+      <figure v-for="(pic, index) in pictures" :key="index" class="image" :class="pic.isPP && 'pp'">
+        <div class="edit-overlay">
           <div class="edit-overlay-content">
+            <div class="button close-button" @click="pp(pic.id)">
+              <b-icon icon="star" size="is-small" />
+            </div>
             <div class="button close-button" @click="remove(pic.id)">
               <b-icon icon="close" size="is-small" />
             </div>
           </div>
         </div>
-        <img :src="pic.url" />
+        <img :src="`http://192.168.99.100:3000/pictures/${pic.path}`" />
       </figure>
     </div>
     <b-field class="file is-centered" position="is-centered">
@@ -37,33 +40,67 @@ export default {
       formData.append("picture", file[0]);
       this.$http
         .post("/pictures/me", formData, {
-          errorHandle: false,
           "Content-Type": "multipart/form-data"
         })
         .then(res => {
-          console.log(res);
+          this.$store.commit('addPicture', res.data.data)
         });
     },
     remove(id) {
-      console.log(id);
+      this.$http
+        .delete(`/pictures/me/${id}`)
+        .then(res => {
+          this.$store.commit('removePicture', id)
+        });
+    },
+    pp(id) {
+      console.log(id)
+      this.$http
+        .patch(`/pictures/me/${id}/pp`)
+        .then(res => {
+          this.$store.commit('setPP', id)
+        });
     }
   }
 };
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 figure {
   display: inline-block;
+  width: 128px;
 }
 .edit-overlay {
   position: absolute;
+
   display: flex;
-  padding: 5px;
   justify-content: flex-end;
+
+  width: 100%;
+  height: 100%;
+
+  padding: 5px;
+  background: rgba(0, 0, 0, .6);
+  opacity: 0;
+  transition: opacity .2s ease;
+
+  &:hover {
+    opacity: 1;
+  }
 }
+
+.image {
+  opacity: .6;
+}
+
+.pp {
+  opacity: 1;
+}
+
 .close-button {
   background: transparent;
   border: none;
+  color: white;
 }
 .close-button:hover {
   background: rgba(0, 0, 0, 0.1);

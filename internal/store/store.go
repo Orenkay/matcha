@@ -67,14 +67,17 @@ type UserService interface {
 type PicturesService interface {
 	Add(p *Picture) error
 	Update(p *Picture) error
-	Delete(id int64) error
+	Delete(userID, id int64) error
+	DeleteByPath(path string) error
 	Pictures(userID int64) ([]*Picture, error)
+	Picture(userID, id int64) (*Picture, error)
+	PP(userID int64) (*Picture, error)
 }
 
 type ProfileService interface {
 	Profile(userID int64) (*Profile, error)
 	Add(profile *Profile) error
-	Delete(userId int64) error
+	Delete(userID int64) error
 	Update(profile *Profile) error
 }
 

@@ -76,7 +76,7 @@ export default {
     submit() {
       this.$refs.form.submit(data => {
         this.$http.put("/profiles/edit", data).then(res => {
-          this.$store.commit("setUserData", "profile", res.data.data);
+          this.$store.commit("setUserData", ["profile", res.data.data]);
           this.$router.push("/app/profile");
         });
       });
