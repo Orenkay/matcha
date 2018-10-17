@@ -89,6 +89,11 @@ func Register(s *store.Store) http.HandlerFunc {
 		// 	render.Render(w, r, api.ErrInternal(err))
 		// 	return
 		// }
+
+		if err := s.PresenceService.Add(user.ID); err != nil {
+			render.Render(w, r, api.ErrInternal(err))
+			return
+		}
 		render.Render(w, r, api.DefaultResponse(http.StatusCreated, nil))
 	}
 }

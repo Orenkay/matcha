@@ -6,6 +6,7 @@ import (
 	"os"
 	"path"
 	"strconv"
+	"strings"
 
 	"github.com/go-chi/render"
 
@@ -32,7 +33,7 @@ func Remove(s *store.Store) http.HandlerFunc {
 				return
 			}
 			if p == nil {
-				render.Render(w, r, api.ErrInvalidRequest(errors.New("The pictures doesn't exist")))
+				render.Render(w, r, api.ErrInvalidRequest(errors.New("This picture doesn't exist")))
 				return
 			}
 		}
@@ -40,10 +41,14 @@ func Remove(s *store.Store) http.HandlerFunc {
 			render.Render(w, r, api.ErrInternal(err))
 			return
 		}
-		if err := os.Remove(path.Join(os.Getenv("MATCHA_PATH"), "assets/uploads", p.Path+".jpg")); err != nil {
-			render.Render(w, r, api.ErrInternal(err))
-			return
+
+		// here we remove locally the img
+		{
+			ss := strings.Split(p.Path, "/")
+			filename := ss[len(ss)-1]
+			os.Remove(path.Join(os.Getenv("MATCHA_PATH"), "assets/uploads", filename+".jpg"))
 		}
+
 		render.Render(w, r, api.DefaultResponse(http.StatusOK, nil))
 	}
 }

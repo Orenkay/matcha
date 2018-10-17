@@ -33,27 +33,7 @@ export default {
   },
   methods: {
     submit() {
-      this.$refs.form.submit(data => {
-        this.$http
-          .post("/auth/register", data, { errorHandle: false })
-          .then(res => {
-            this.$toast.open("Account successfuly created");
-            this.close();
-          })
-          .catch(err => {
-            if (err.response.status === 400) {
-              const { data } = err.response.data;
-              if (data.validation !== undefined) {
-                data.validation.keys.forEach((k, i) => {
-                  this.$refs.form.fieldError(
-                    k,
-                    data.validation.details[i].message
-                  );
-                });
-              }
-            }
-          });
-      });
+      this.$refs.form.submit(() => this.close());
     }
   }
 };

@@ -8,7 +8,7 @@ import (
 	"github.com/orenkay/matcha/internal/store"
 )
 
-func Profile(s *store.Store) http.HandlerFunc {
+func Account(s *store.Store) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		user := r.Context().Value("user").(*store.User)
 		profile, err := s.ProfileService.Profile(user.ID)
@@ -39,12 +39,22 @@ func Profile(s *store.Store) http.HandlerFunc {
 				return
 			}
 		}
+		matches, err := s.MatchService.Matches(user.ID)
+		{
+			if err != nil {
+				render.Render(w, r, api.ErrInternal(err))
+				return
+			}
+		}
 		render.Render(w, r, api.DefaultResponse(http.StatusOK, render.M{
-			"account":   user,
-			"profile":   profile,
-			"loc":       loc,
-			"interests": interests,
-			"pictures":  pictures,
+			"account": user,
+			"meta": render.M{
+				"profile":   profile,
+				"loc":       loc,
+				"interests": interests,
+				"pictures":  pictures,
+				"matches":   matches,
+			},
 		}))
 	})
 }

@@ -11,10 +11,27 @@
 export default {
   methods: {
     submit(cb) {
-      this.$refs.form.submit(cb);
-    },
-    fieldError(k, errors) {
-      this.$refs.form.fieldError(k, errors);
+      this.$refs.form.submit(data => {
+        this.$http
+          .post("/auth/register", data)
+          .then(res => {
+            this.$toast.open("Account successfuly created");
+            cb();
+          })
+          .catch(err => {
+            if (err.response && err.response.status === 400) {
+              const { data } = err.response.data;
+              if (data.validation !== undefined) {
+                data.validation.keys.forEach((k, i) => {
+                  this.$refs.form.fieldError(
+                    k,
+                    data.validation.details[i].message
+                  );
+                });
+              }
+            }
+          });
+      });
     }
   }
 };

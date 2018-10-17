@@ -11,7 +11,7 @@
         <user-pictures :editable="true" :pictures="userData.pictures" />
       </b-step-item>
       <b-step-item title="Your Location" :next="step4next">
-        <location-form ref="locForm" />
+        <user-location :editable="true" :location="userData.loc" />
       </b-step-item>
       <b-step-item title="Done!">
         <div class="has-text-centered">
@@ -25,14 +25,14 @@
 
 <script>
 import PersonalForm from "../../components/forms/PersonalForm";
-import LocationForm from "../../components/forms/LocationForm";
+import UserLocation from "../../components/UserLocation";
 import UserPictures from "../../components/UserPictures";
 import UserInterests from "../../components/UserInterests";
 
 export default {
   components: {
     PersonalForm,
-    LocationForm,
+    UserLocation,
     UserPictures,
     UserInterests
   },
@@ -43,46 +43,31 @@ export default {
     currentStep() {
       if (this.userData.profile.lastName === undefined) return 0;
       if (this.userData.interests.length === 0) return 1;
-      if (this.userData.pictures.length === 0) return 2;
+      if (this.userData.pictures.findIndex(p => p.isPP) < 0) return 2;
       if (this.userData.loc.address === undefined) return 3;
     }
   },
   methods: {
     step1next(next) {
-      this.$refs.personalForm.submit(data => {
-        const req =
-          this.$store.getters.profile.lastName === undefined
-            ? this.$http.post("/profiles", data)
-            : this.$http.patch("/profiles/edit", data);
-        req.then(res => {
-          this.$store.commit("setUserData", ["profile", res.data.data]);
-          next();
-        });
-      });
+      this.$refs.personalForm.submit(next);
     },
     step2next(next) {
       if (this.userData.interests.length === 0) {
-        return this.$toast.open({message:"You must add atleast one interest", queue: false, type: "is-danger"});
+        return this.$toast.error("You must add atleast one interest");
       }
       next();
     },
     step3next(next) {
       if (this.userData.pictures.findIndex(p => p.isPP) < 0) {
-        return this.$toast.open({message:"You must have atleast one PP", queue: false, type: "is-danger"});
+        return this.$toast.error("You must have atleast one PP");
       }
       next();
     },
     step4next(next) {
-      this.$refs.locForm.submit(data => {
-        const req=
-          this.$store.getters.loc.address === undefined
-              ? this.$http.post("/loc/me", {placeId: data.place_id})
-              : this.$http.patch("/loc/me/edit", {placeId: data.place_id});
-        req.then(res => {
-          this.$store.commit("setUserData", ["loc", res.data.data]);
-          next();
-        });
-      })
+      if (this.userData.loc.address === undefined) {
+        return this.$toast.error("You must set your location");
+      }
+      next();
     }
   }
 };

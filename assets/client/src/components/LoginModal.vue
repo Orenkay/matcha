@@ -33,25 +33,7 @@ export default {
   },
   methods: {
     submit() {
-      this.$refs.form.submit(data => {
-        this.$http
-          .post("/auth/login", data, { errorHandle: false })
-          .then(res => {
-            this.$store.commit("login", res.data.token);
-            this.$toast.open("Connected");
-            this.close();
-          })
-          .catch(err => {
-            if (err.response) {
-              if (err.response.status === 400) {
-                this.$toast.open({
-                  message: err.response.data.error,
-                  type: "is-danger"
-                });
-              }
-            }
-          });
-      });
+      this.$refs.form.submit();
     }
   }
 };

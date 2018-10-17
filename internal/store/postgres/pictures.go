@@ -15,7 +15,7 @@ const (
 		CREATE TABLE IF NOT EXISTS pictures (
 			id SERIAL PRIMARY KEY,
 			userId int NOT NULL,
-			path varchar(64) NOT NULL,
+			path varchar(256) NOT NULL,
 			isPP boolean NOT NULL
 		);
 	`

@@ -65,6 +65,6 @@ func Add(s *store.Store) http.HandlerFunc {
 			render.Render(w, r, api.ErrInternal(err))
 			return
 		}
-		render.Render(w, r, api.DefaultResponse(http.StatusOK, l))
+		render.Render(w, r, api.DefaultResponse(http.StatusCreated, l))
 	}
 }

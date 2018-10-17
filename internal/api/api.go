@@ -104,6 +104,14 @@ func ErrInternal(err error) render.Renderer {
 	}
 }
 
+func ErrNotFound(err error) render.Renderer {
+	return &ErrResponse{
+		Err:            err,
+		HTTPStatusCode: 404,
+		StatusText:     err.Error(),
+	}
+}
+
 func ErrAuthenticate() render.Renderer {
 	return &ErrResponse{
 		Err:            errors.New(""),

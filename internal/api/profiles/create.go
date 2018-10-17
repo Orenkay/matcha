@@ -2,7 +2,6 @@ package profiles
 
 import (
 	"errors"
-	"fmt"
 	"net/http"
 
 	"github.com/go-chi/render"
@@ -13,6 +12,7 @@ import (
 type CreateRequest struct {
 	LastName   string `json:"lastName"`
 	FirstName  string `json:"firstName"`
+	Birthdate  int64  `json:"birthDate"`
 	Gender     string `json:"gender"`
 	Attraction string `json:"attraction"`
 	Bio        string `json:"bio"`
@@ -48,11 +48,11 @@ func Create(s *store.Store) http.HandlerFunc {
 			UserID:     user.ID,
 			LastName:   data.LastName,
 			FirstName:  data.FirstName,
+			Birthdate:  data.Birthdate,
 			Gender:     data.Gender,
 			Attraction: data.Attraction,
 			Bio:        data.Bio,
 		}
-		fmt.Println(profile)
 		if err := s.ProfileService.Add(profile); err != nil {
 			render.Render(w, r, api.ErrInternal(err))
 			return

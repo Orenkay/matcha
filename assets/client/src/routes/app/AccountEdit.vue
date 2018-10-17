@@ -27,57 +27,10 @@ export default {
   },
   methods: {
     submit() {
-      this.$refs.form.submit(data => {
-        this.passConfirm(pass => {
-          data.currPass = pass;
-          this.$http
-            .patch("/users/me/", data, { errorHandle: false })
-            .then(res => {
-              this.$toast.open("Account informations successfuly edited");
-              this.$store.commit("logout");
-            })
-            .catch(err => {
-              if (err.response && err.response.status === 400) {
-                const { data } = err.response;
-                if (data.data && data.data.validation !== undefined) {
-                  data.data.validation.keys.forEach((k, i) => {
-                    this.$refs.form.fieldError(
-                      k,
-                      data.data.validation.details[i].message
-                    );
-                  });
-                } else {
-                  this.$toast.open({
-                    message: data.error,
-                    type: "is-danger"
-                  });
-                }
-              }
-            });
-        });
-      });
+      this.$refs.form.submit();
     },
     submitPass() {
-      this.$refs.formPass.submit(data => {
-        console.lo;
-        this.passConfirm(pass => {
-          data.currPass = pass;
-          this.$http
-            .patch("/users/me/password", data, { errorHandle: false })
-            .then(res => {
-              this.$toast.open("Password changed");
-              this.$store.commit("logout");
-            })
-            .catch(err => {
-              if (err.response && err.response.status === 400) {
-                this.$toast.open({
-                  message: err.response.data.error,
-                  type: "is-danger"
-                });
-              }
-            });
-        });
-      });
+      this.$refs.formPass.submit();
     },
     deleteAccount() {
       this.$dialog.prompt({
@@ -86,22 +39,16 @@ export default {
           type: "password"
         },
         onConfirm: pass => {
-          this.$http.delete("/users/me/" + pass, { errorHandle: false}).then(res => {
-            this.$toast.open("Account deleted");
-            this.$store.commit("logout");
-          }).catch(err => {
-            this.$toast.open(err.response.data.error)
-          });
+          this.$http
+            .delete("/users/me/" + pass)
+            .then(res => {
+              this.$toast.open("Account deleted");
+              this.$store.commit("logout");
+            })
+            .catch(err => {
+              this.$toast.error(err.response.data.error);
+            });
         }
-      });
-    },
-    passConfirm(cb) {
-      this.$dialog.prompt({
-        message: `Type your current password`,
-        inputAttrs: {
-          type: "password"
-        },
-        onConfirm: cb
       });
     }
   }

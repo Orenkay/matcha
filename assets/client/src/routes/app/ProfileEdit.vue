@@ -2,17 +2,21 @@
   <div>
     <b-tabs>
       <b-tab-item label="Profile">
-        <m-form :fields="form.fields" ref="form" />
+        <personal-form ref="form" />
         <br />
         <button class="button is-black" @click="submit">Edit</button>
       </b-tab-item>
 
       <b-tab-item label="Pictures">
-        TODO
+        <user-pictures :editable="true" :pictures="userData.pictures" />
+      </b-tab-item>
+
+      <b-tab-item label="Interests">
+        <user-interests :editable="true" :tags="userData.interests" />
       </b-tab-item>
 
       <b-tab-item label="Localisation">
-        TODO
+        <user-location :editable="true" :location="userData.loc" />
       </b-tab-item>
 
     </b-tabs>
@@ -20,67 +24,33 @@
 </template>
 
 <script>
-import Form from "../../components/Form";
+import PersonalForm from "../../components/forms/PersonalForm";
+import UserPictures from "../../components/UserPictures";
+import UserLocation from "../../components/UserLocation";
+import UserInterests from "../../components/UserInterests";
+
 export default {
   components: {
-    "m-form": Form
+    PersonalForm,
+    UserPictures,
+    UserLocation,
+    UserInterests
   },
-  data() {
-    const profile = this.$store.getters.profile;
-
-    return {
-      form: {
-        fields: {
-          firstName: {
-            label: "Firstname",
-            value: profile.firstName,
-            required: true
-          },
-          lastName: {
-            label: "Lastname",
-            value: profile.lastName,
-            required: true
-          },
-          gender: {
-            label: "Gender",
-            value: profile.gender,
-            type: "select",
-            options: [
-              { value: "male", label: "Male" },
-              { value: "female", label: "Female" }
-            ],
-            required: true
-          },
-          attraction: {
-            label: "Sexual Orientation",
-            value: profile.attraction,
-            type: "select",
-            options: [
-              { value: "bi", label: "Bisexual" },
-              { value: "hetero", label: "Heterosexual" },
-              { value: "homo", label: "Homosexual" }
-            ],
-            required: true
-          },
-          bio: {
-            label: "Bio",
-            value: profile.bio,
-            props: () => ({ type: "textarea", maxlength: 200 }),
-            required: true
-          }
-        }
-      }
-    };
+  computed: {
+    userData() {
+      return this.$store.getters.userData;
+    }
   },
   methods: {
     submit() {
-      this.$refs.form.submit(data => {
-        this.$http.put("/profiles/edit", data).then(res => {
-          this.$store.commit("setUserData", ["profile", res.data.data]);
-          this.$router.push("/app/profile");
-        });
-      });
+      this.$refs.form.submit(() => this.$router.push("/app/profile/me"));
     }
   }
 };
 </script>
+
+<style>
+.b-tabs .autocomplete .dropdown-menu {
+  position: initial;
+}
+</style>

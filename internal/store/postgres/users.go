@@ -11,6 +11,22 @@ type UserService struct {
 }
 
 const (
+	profileCheckFuncSQL = `
+		DROP FUNCTION IF EXISTS profile_check;
+		CREATE OR REPLACE FUNCTION profile_check(_id int) RETURNS bool AS $$
+		DECLARE passed BOOLEAN;
+		BEGIN
+			SELECT t1.userId = _id FROM profiles t1
+				LEFT JOIN pictures c1 ON c1.userId = t1.userId AND isPP=true
+				LEFT JOIN users_interests c2 ON c2.userId = t1.userId
+				WHERE t1.userId = _id
+				GROUP BY t1.userId, c1.userId, c2.userId
+				HAVING (COUNT(c1) > 0 AND COUNT(c2) > 0) INTO passed;
+			RETURN passed;
+		END;
+		$$ LANGUAGE plpgsql;
+	`
+
 	createUsersTableSQL = `
 		CREATE TABLE IF NOT EXISTS users (
 			id SERIAL PRIMARY KEY,
@@ -22,6 +38,9 @@ const (
 )
 
 func NewUserService(db *sql.DB) store.UserService {
+	if _, err := db.Exec(profileCheckFuncSQL); err != nil {
+		panic(err)
+	}
 	if _, err := db.Exec(createUsersTableSQL); err != nil {
 		panic(err)
 	}

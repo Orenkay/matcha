@@ -81,7 +81,7 @@ func Add(s *store.Store) http.HandlerFunc {
 
 		p := &store.Picture{
 			UserID: user.ID,
-			Path:   filename,
+			Path:   "http://" + r.Host + "/pictures/" + filename,
 			IsPP:   false,
 		}
 		if err := s.PicturesService.Add(p); err != nil {

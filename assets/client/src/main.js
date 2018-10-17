@@ -19,8 +19,21 @@ Vue.use(MatchaForm)
 Vue.use(VueGoogleMaps, {
   load: {
     key: 'AIzaSyBciG2mapnXT-z59x40gmE_cT_7W61Mb8M',
-    libraries: 'places',
-  },
+    libraries: 'places'
+  }
+})
+
+// Just an alias ...
+Vue.use({
+  install (Vue) {
+    Vue.prototype.$toast.error = function (message) {
+      this.open({
+        type: 'is-danger',
+        queue: false,
+        message
+      })
+    }
+  }
 })
 
 // eslint-disable-next-line

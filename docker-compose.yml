@@ -8,6 +8,10 @@ services:
       POSTGRES_PASSWORD: matcha
       POSTGRES_DB: matcha
 
+  redis:
+    restart: always
+    image: redis:latest
+
   pgweb:
     restart: always
     image: sosedoff/pgweb
@@ -28,6 +32,7 @@ services:
     entrypoint: go run ./cmd/matcha/main.go
     links:
       - postgres
+      - redis
     ports:
       - "3000:3000"
     environment:

@@ -28,6 +28,11 @@ func Add(s *store.Store) http.HandlerFunc {
 			return
 		}
 
+		if len(data.Value) < 2 {
+			render.Render(w, r, api.ErrInvalidRequest(errors.New("Interest must be atleast 2 chars long")))
+			return
+		}
+
 		i, err := s.InterestService.Interest(user.ID, data.Value)
 		{
 			if err != nil {

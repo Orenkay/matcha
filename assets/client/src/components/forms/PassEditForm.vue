@@ -8,8 +8,32 @@
 <script>
 export default {
   methods: {
-    submit(cb) {
-      this.$refs.form.submit(cb);
+    submit() {
+      this.$refs.form.submit(data => {
+        this.passConfirm(pass => {
+          data.currPass = pass;
+          this.$http
+            .patch("/users/me/password", data)
+            .then(res => {
+              this.$toast.open("Password changed");
+              this.$store.commit("logout");
+            })
+            .catch(err => {
+              if (err.response && err.response.status === 400) {
+                this.$toast.error(err.response.data.error);
+              }
+            });
+        });
+      });
+    },
+    passConfirm(cb) {
+      this.$dialog.prompt({
+        message: `Type your current password`,
+        inputAttrs: {
+          type: "password"
+        },
+        onConfirm: cb
+      });
     }
   }
 };

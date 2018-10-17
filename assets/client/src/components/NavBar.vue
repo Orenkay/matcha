@@ -14,6 +14,12 @@
 
       <div class="navbar-menu" :class="menuOpened && 'is-active'">
         <div class="navbar-start">
+          <router-link class="navbar-item" to="/app/history">
+            History
+          </router-link>
+          <router-link class="navbar-item" to="/app/messages">
+            Messages
+          </router-link>
         </div>
 
         <div class="navbar-end">
@@ -26,11 +32,7 @@
                   </span>
                   <span>Profile</span>
                 </button>
-                <button class="button is-black is-outlined">
-                  <span class="icon">
-                    <b-icon icon="bell" size="is-small" />
-                  </span>
-                </button>
+                <notifications-dropdown />
                 <b-dropdown position="is-bottom-left">
                   <button class="button is-black is-outlined" slot="trigger">
                     <span class="icon">
@@ -40,12 +42,6 @@
                   <b-dropdown-item @click="accountEdit">
                     <b-icon icon="settings" size="is-small" />
                     <span>Account</span>
-                  </b-dropdown-item>
-                  <b-dropdown-item @click="toggleNotifications">
-                    <div :class="notificationsEnabled ? 'has-text-link' : 'has-text-danger'">
-                      <b-icon :icon="notificationsEnabled ? 'check' : 'close'" size="is-small" />
-                      <span>Notifications</span>
-                    </div>
                   </b-dropdown-item>
                   <b-dropdown-item @click="logout">
                     <div>
@@ -64,7 +60,11 @@
 </template>
 
 <script>
+import NotificationsDropdown from "./NotificationsDropdown";
 export default {
+  components: {
+    NotificationsDropdown
+  },
   data() {
     return {
       menuOpened: false
@@ -80,23 +80,14 @@ export default {
       this.menuOpened = !this.menuOpened;
     },
     profile() {
-      this.$router.push("/app/profile");
+      this.$router.push("/app/profile/me");
     },
     accountEdit() {
       this.$router.push("/app/account/edit");
     },
-    toggleNotifications() {
-      this.$store.commit("toggle-notifications");
-      this.$toast.open({
-        queue: false,
-        message: `Notifications ${
-          this.notificationsEnabled ? "enabled" : "disabled"
-        }`
-      });
-    },
     logout() {
       this.$store.dispatch("logout").catch(() => {
-        this.$toast.open("Unable to logout, please retry");
+        this.$router.go();
       });
     }
   }

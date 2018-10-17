@@ -1,38 +1,50 @@
 <template>
   <div>
-    <div class="has-text-centered">
-      <figure v-for="(pic, index) in pictures" :key="index" class="image" :class="pic.isPP && 'pp'">
-        <div class="edit-overlay">
-          <div class="edit-overlay-content">
-            <div class="button close-button" @click="pp(pic.id)">
-              <b-icon icon="star" size="is-small" />
-            </div>
-            <div class="button close-button" @click="remove(pic.id)">
-              <b-icon icon="close" size="is-small" />
-            </div>
-          </div>
-        </div>
-        <img :src="`http://192.168.99.100:3000/pictures/${pic.path}`" />
+    <div v-if="onlyPP">
+      <figure>
+        <div class="image pp is-rounded" :style="`background-image: url('${pp.path}');'`"></div>
       </figure>
     </div>
-    <b-field class="file is-centered" position="is-centered">
-      <b-upload v-model="file" @input="upload">
-        <a class="button is-primary">
-          <b-icon icon="upload"></b-icon>
-          <span>Click to upload</span>
-        </a>
-      </b-upload>
-    </b-field>
+    <div v-else>
+      <div class="has-text-centered">
+        <figure v-for="(pic, index) in pictures" :key="index" class="image" :class="pic.isPP && 'pp'">
+          <div class="edit-overlay">
+            <div class="edit-overlay-content">
+              <div class="button close-button" @click="updatePP(pic.id)">
+                <b-icon icon="star" size="is-small" />
+              </div>
+              <div class="button close-button" @click="remove(pic.id)">
+                <b-icon icon="close" size="is-small" />
+              </div>
+            </div>
+          </div>
+          <div class="image" :class="pic.isPP && 'pp'" :style="`background-image: url('${pic.path}');`"></div>
+        </figure>
+      </div>
+      <b-field v-if="editable" class="file is-centered" position="is-centered">
+        <b-upload v-model="file" @input="upload">
+          <a class="button is-primary">
+            <b-icon icon="upload"></b-icon>
+            <span>Click to upload</span>
+          </a>
+        </b-upload>
+      </b-field>
+    </div>
   </div>
 </template>
 
 <script>
 export default {
-  props: ["pictures"],
+  props: ["onlyPP", "pictures", "editable"],
   data() {
     return {
       file: null
     };
+  },
+  computed: {
+    pp() {
+      return this.pictures.find(p => p.isPP);
+    }
   },
   methods: {
     upload(file) {
@@ -40,35 +52,26 @@ export default {
       formData.append("picture", file[0]);
       this.$http
         .post("/pictures/me", formData, {
-          errorHandle: false,
           "Content-Type": "multipart/form-data"
         })
         .then(res => {
-          this.$store.commit('addPicture', res.data.data)
+          this.$store.commit("addPicture", res.data.data);
         })
         .catch(err => {
           if (err.response && err.response.status === 400) {
-            this.$toast.open({
-              message: err.response.data.error,
-              type: "is-danger"
-            })
+            this.$toast.error(err.response.data.error);
           }
         });
     },
     remove(id) {
-      this.$http
-        .delete(`/pictures/me/${id}`)
-        .then(res => {
-          this.$store.commit('removePicture', id)
-        });
+      this.$http.delete(`/pictures/me/${id}`).then(res => {
+        this.$store.commit("removePicture", id);
+      });
     },
-    pp(id) {
-      console.log(id)
-      this.$http
-        .patch(`/pictures/me/${id}/pp`)
-        .then(res => {
-          this.$store.commit('setPP', id)
-        });
+    updatePP(id) {
+      this.$http.patch(`/pictures/me/${id}/pp`).then(res => {
+        this.$store.commit("setPP", id);
+      });
     }
   }
 };
@@ -77,7 +80,6 @@ export default {
 <style lang="scss" scoped>
 figure {
   display: inline-block;
-  width: 128px;
 }
 .edit-overlay {
   position: absolute;
@@ -89,9 +91,10 @@ figure {
   height: 100%;
 
   padding: 5px;
-  background: rgba(0, 0, 0, .6);
+  background: rgba(0, 0, 0, 0.6);
   opacity: 0;
-  transition: opacity .2s ease;
+  transition: opacity 0.2s ease;
+  z-index: 1;
 
   &:hover {
     opacity: 1;
@@ -99,11 +102,19 @@ figure {
 }
 
 .image {
-  opacity: .6;
+  opacity: 0.6;
+  height: 128px;
+  width: 128px;
+  background-size: 100%;
+  background-position: 50%;
 }
 
 .pp {
   opacity: 1;
+}
+
+.is-rounded {
+  border-radius: 100%;
 }
 
 .close-button {

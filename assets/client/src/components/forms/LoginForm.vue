@@ -9,10 +9,22 @@
 export default {
   methods: {
     submit(cb) {
-      this.$refs.form.submit(cb);
-    },
-    fieldError(k, errors) {
-      this.$refs.form.fieldError(k, errors);
+      this.$refs.form.submit(data => {
+        this.$http
+          .post("/auth/login", data)
+          .then(res => {
+            this.$store.commit("login", res.data.token);
+            this.$toast.open("Connected");
+            this.close();
+          })
+          .catch(err => {
+            if (err.response) {
+              if (err.response.status === 400) {
+                this.$toast.error(err.response.data.error);
+              }
+            }
+          });
+      });
     }
   }
 };

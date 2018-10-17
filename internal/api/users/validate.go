@@ -45,6 +45,6 @@ func Validate(s *store.Store) http.HandlerFunc {
 			return
 		}
 
-		render.Render(w, r, &api.Response{200, "account is now activated"})
+		render.Render(w, r, api.DefaultResponse(http.StatusOK, "account is now activated"))
 	}
 }

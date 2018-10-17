@@ -8,11 +8,42 @@
 <script>
 export default {
   methods: {
-    submit(cb) {
-      this.$refs.form.submit(cb);
+    submit() {
+      this.$refs.form.submit(data => {
+        this.passConfirm(pass => {
+          data.currPass = pass;
+          this.$http
+            .patch("/users/me/", data)
+            .then(res => {
+              this.$toast.open("Account informations successfuly edited");
+              this.$store.commit("logout");
+            })
+            .catch(err => {
+              if (err.response && err.response.status === 400) {
+                const { data } = err.response;
+                if (data.data && data.data.validation !== undefined) {
+                  data.data.validation.keys.forEach((k, i) => {
+                    this.$refs.form.fieldError(
+                      k,
+                      data.data.validation.details[i].message
+                    );
+                  });
+                } else {
+                  this.$toast.error(err.response.data.error);
+                }
+              }
+            });
+        });
+      });
     },
-    fieldError(k, v) {
-      this.$refs.form.fieldError(k, v)
+    passConfirm(cb) {
+      this.$dialog.prompt({
+        message: `Type your current password`,
+        inputAttrs: {
+          type: "password"
+        },
+        onConfirm: cb
+      });
     }
   },
   computed: {

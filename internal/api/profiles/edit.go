@@ -11,6 +11,7 @@ import (
 type EditRequest struct {
 	LastName   string `json:"lastName"`
 	FirstName  string `json:"firstName"`
+	Birthdate  string `json:"birthDate"`
 	Gender     string `json:"gender"`
 	Attraction string `json:"attraction"`
 	Bio        string `json:"bio"`
@@ -39,6 +40,7 @@ func Edit(s *store.Store) http.HandlerFunc {
 		}
 		profile.LastName = data.LastName
 		profile.FirstName = data.FirstName
+		profile.Birthdate = data.Birthdate
 		profile.Gender = data.Gender
 		profile.Attraction = data.Attraction
 		profile.Bio = data.Bio

@@ -67,6 +67,26 @@ func (s *InterestService) Interest(userID int64, slug string) (*store.Interest, 
 	return i, err
 }
 
+func (s *InterestService) Interests() ([]*store.Interest, error) {
+	var interests []*store.Interest
+	rows, err := s.db.Query("SELECT * FROM users_interests")
+	{
+		if err != nil {
+			return nil, err
+		}
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		i := &store.Interest{}
+		if err := rows.Scan(&i.ID, &i.UserID, &i.Value); err != nil {
+			return nil, err
+		}
+		interests = append(interests, i)
+	}
+	return interests, nil
+}
+
 func (s *InterestService) AllByUser(userID int64) ([]*store.Interest, error) {
 	var interests []*store.Interest
 	rows, err := s.db.Query("SELECT value FROM users_interests WHERE userId=$1", userID)

@@ -21,6 +21,15 @@ export default {
         this.errors.push(...this.validate(v, formData));
       }
       return this.errors.length === 0;
+    },
+    _getFormParent() {
+      let c = this.$parent;
+      while (c !== undefined) {
+        if (c.$data._isMatchaForm) {
+          return c;
+        }
+        c = c.$parent;
+      }
     }
   },
   data() {
@@ -30,14 +39,15 @@ export default {
     };
   },
   created() {
-    if (!this.$parent.$data._isMatchaForm) {
+    this.formParent = this._getFormParent();
+    if (!this.formParent) {
       this.$destroy();
       throw new Error("You should wrap mFormField on a mForm");
     }
-    this.$parent.fields[this.name] = this;
+    this.formParent.fields[this.name] = this;
   },
   beforeDestroy() {
-    delete this.$parent.fields[this.name];
+    delete this.formParent.fields[this.name];
   }
 };
 </script>
