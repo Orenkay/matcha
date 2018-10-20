@@ -33,9 +33,21 @@ func NewInterestService(db *sql.DB, r *redis.Client) store.InterestService {
 	}
 
 	s.redis.Del("users_interests")
+
+	interestsMap := make(map[int64][]*store.Interest)
 	for _, i := range interests {
 		if err := s.push(i); err != nil {
 			panic(err) // should not happen
+		}
+	}
+
+	for _, i := range interests {
+		interestsMap[i.UserID] = append(interestsMap[i.UserID], i)
+	}
+
+	for k, v := range interestsMap {
+		if s.set(k, v); err != nil {
+			panic(err)
 		}
 	}
 

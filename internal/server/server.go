@@ -32,9 +32,10 @@ func New(store *store.Store) *Server {
 	router := chi.NewRouter()
 
 	cors := cors.New(cors.Options{
-		AllowedOrigins: []string{"*"},
-		AllowedMethods: []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
-		AllowedHeaders: []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token", "X-Auth-Token"},
+		AllowedOrigins:   []string{"http://192.168.1.242:8080", "http://0.0.0.0:8080" /* TODO: remove me later: */, "*"},
+		AllowCredentials: true,
+		AllowedMethods:   []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
+		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token", "X-Auth-Token"},
 	})
 
 	// init middlewares
@@ -58,7 +59,6 @@ func New(store *store.Store) *Server {
 	router.Mount("/block", blocks.Routes(store))
 	router.Mount("/report", reports.Routes(store))
 	router.Mount("/matcher", matcher.Routes(store))
-
 	return &Server{
 		store:  store,
 		router: router,

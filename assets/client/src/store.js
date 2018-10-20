@@ -1,6 +1,6 @@
+import cookies from 'js-cookie'
 import Vue from 'vue'
 import Vuex from 'vuex'
-import cookies from 'js-cookie'
 
 import axios from './axios'
 import router from './router'

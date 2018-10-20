@@ -34,12 +34,19 @@ func NewLikesService(db *sql.DB, r *redis.Client, ns store.NotificationService) 
 
 	s.redis.Del("users_likes")
 	s.redis.Del("users_likes_count")
+
+	likesMap := make(map[int64][]*store.Like)
 	for _, l := range likes {
-		if err := s.push(l.UserID, l); err != nil {
+		likesMap[l.UserID] = append(likesMap[l.UserID], l)
+		if s.redis.HIncrBy("users_likes_count", strconv.FormatInt(l.TargetID, 10), 1).Err(); err != nil {
 			panic(err)
 		}
 	}
-
+	for k, l := range likesMap {
+		if s.set(k, l); err != nil {
+			panic(err)
+		}
+	}
 	return s
 }
 

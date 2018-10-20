@@ -33,9 +33,14 @@ func NewHistoryService(db *sql.DB, r *redis.Client) store.HistoryService {
 	}
 
 	s.redis.Del("users_history")
+	histories := make(map[int64][]*store.HistoryItem)
 	for _, i := range items {
-		if err := s.push(i); err != nil {
-			panic(err) // should never happen
+		histories[i.UserID] = append(histories[i.UserID], i)
+	}
+
+	for k, h := range histories {
+		if s.set(k, h); err != nil {
+			panic(err)
 		}
 	}
 

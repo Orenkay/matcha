@@ -35,7 +35,12 @@ func (s *PresenceService) Add(userID int64) error {
 
 func (s *PresenceService) Heartbeat(userID int64) error {
 	_, err := s.db.Exec("UPDATE users_presences SET time=$1 WHERE userId=$2", time.Now().Unix(), &userID)
-	return err
+	{
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func (s *PresenceService) LastHeartbeat(userID int64) (int64, error) {

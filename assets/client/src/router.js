@@ -8,6 +8,7 @@ import AppNew from './routes/app/New.vue'
 import AppProfile from './routes/app/Profile.vue'
 import AppSuggestions from './routes/app/Suggestions.vue'
 import AppMessages from './routes/app/Messages.vue'
+import AppSearch from './routes/app/Search.vue'
 import AppHistory from './routes/app/History.vue'
 import AppMessagesList from './routes/app/MessagesList.vue'
 import AppProfileEdit from './routes/app/ProfileEdit.vue'
@@ -37,6 +38,10 @@ const routes = [
         beforeEnter (to, from, next) {
           store.getters.inited ? next('/app') : next()
         }
+      },
+      {
+        path: 'search',
+        component: AppSearch
       },
       {
         path: 'history',

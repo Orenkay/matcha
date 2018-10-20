@@ -21,7 +21,6 @@ func Routes(s *store.Store) *chi.Mux {
 		r.Patch("/password", EditPassword(s))
 		r.Patch("/", EditAccount(s))
 		r.Delete("/{pass}", DeleteAccount(s))
-		r.Patch("/heartbeat", Heartbeat(s))
 	})
 
 	router.Route("/{userID}", func(r chi.Router) {
@@ -44,15 +43,5 @@ func History(s *store.Store) http.HandlerFunc {
 			}
 		}
 		render.Render(w, r, api.DefaultResponse(http.StatusOK, history))
-	}
-}
-func Heartbeat(s *store.Store) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		user := r.Context().Value("user").(*store.User)
-		if err := s.PresenceService.Heartbeat(user.ID); err != nil {
-			render.Render(w, r, api.ErrInternal(err))
-			return
-		}
-		render.Render(w, r, api.DefaultResponse(http.StatusOK, nil))
 	}
 }

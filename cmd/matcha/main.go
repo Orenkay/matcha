@@ -21,7 +21,8 @@ func main() {
 	defer db.Close()
 
 	r := redis.NewClient(&redis.Options{
-		Addr: "redis:6379",
+		Addr:     "redis:6379",
+		PoolSize: 100,
 	})
 	if err := r.Ping().Err(); err != nil {
 		panic(err)

@@ -1,23 +1,16 @@
 <template>
   <div>
-    <b-collapse class="filter-collapse" :open="false">
-      <div slot="trigger" slot-scope="props" class="card-header">
-        <p class="card-header-title">
-          Advanced settings
-        </p>
-        <a class="card-header-icon">
-          <b-icon :icon="props.open ? 'menu-down' : 'menu-up'" type="is-black">
-          </b-icon>
-        </a>
-      </div>
+    <b-collapse class="filter-collapse" :open="true">
       <div class="notification">
         <div class="content">
-          <filters-form @apply="filtersApply" />
+          <filters-form @apply="filtersApply">
+            <span slot="button-label">Search</span>
+          </filters-form>
         </div>
       </div>
     </b-collapse>
     <br />
-    <router-link v-for="(s, index) in suggestions" :key="index" :to="`/app/profile/${s.profile.userId}`">
+    <router-link v-for="(s, index) in searches" :key="index" :to="`/app/profile/${s.profile.userId}`">
       <article class="media">
         <figure class="media-left">
           <div class="image is-64x64" :style="`background-image: url('${s.pp}')`"></div>
@@ -59,12 +52,9 @@ export default {
     UserLocation,
     FiltersForm
   },
-  created() {
-    this.fetchData();
-  },
   data() {
     return {
-      suggestions: []
+      searches: []
     };
   },
   methods: {
@@ -72,10 +62,10 @@ export default {
       this.fetchData(params);
     },
     fetchData(params) {
-      params = Object.assign(params || {}, { suggestion: true });
-      this.$http.get("/matcher/0", { params }).then(res => {
+      params = Object.assign(params || {}, { suggestion: false });
+      this.$http.get("/matcher/1", { params }).then(res => {
         if (!res.data.data) {
-          this.suggestions = [];
+          this.searches = [];
           return;
         }
         Promise.all(
@@ -93,8 +83,8 @@ export default {
                 });
               })
           )
-        ).then(suggestions => {
-          this.suggestions = suggestions;
+        ).then(searches => {
+          this.searches = searches;
         });
       });
     },

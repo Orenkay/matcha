@@ -1,29 +1,42 @@
 <template>
   <m-form ref="form">
     <b-field horizontal label="Distance">
-      <m-form-field name="distanceMin" type="input" :props="{placeholder: 'Min'}" />
-      <m-form-field name="distanceMax" type="input" :props="{placeholder: 'Max'}" />
+      <m-form-field name="distanceMin" type="input" :validate="validate" :props="{placeholder: 'Min'}" />
+      <m-form-field name="distanceMax" type="input" :validate="validate" :props="{placeholder: 'Max'}" />
     </b-field>
     <b-field horizontal label="Age">
-      <m-form-field name="ageMin" type="input" :props="{placeholder: 'Min'}" />
-      <m-form-field name="ageMax" type="input" :props="{placeholder: 'Max'}" />
+      <m-form-field name="ageMin" type="input" :validate="validate" :props="{placeholder: 'Min'}" />
+      <m-form-field name="ageMax" type="input" :validate="validate" :props="{placeholder: 'Max'}" />
     </b-field>
     <b-field horizontal label="Popularity">
-      <m-form-field name="popularityMin" type="input" :props="{placeholder: 'Min'}" />
-      <m-form-field name="popularityMax" type="input" :props="{placeholder: 'Max'}" />
+      <m-form-field name="popularityMin" type="input" :validate="validate" :props="{placeholder: 'Min'}" />
+      <m-form-field name="popularityMax" type="input" :validate="validate" :props="{placeholder: 'Max'}" />
     </b-field>
     <b-field horizontal label="Sort by">
-      <m-form-field type="select" name="sort" value="0">
-        <option value="0">Default</option>
-        <option value="1">Distance</option>
-        <option value="2">Age</option>
-        <option value="3">Popularity</option>
-      </m-form-field>
+      <b-field>
+        <m-form-field type="select" name="sort" value="Default">
+          <option>Default</option>
+          <option>Distance</option>
+          <option>Age</option>
+          <option>Popularity</option>
+        </m-form-field>
+        <b-radio-button v-model="sortBy" native-value="asc" type="is-link">
+          <b-icon icon="sort-ascending"></b-icon>
+          <span>Asc</span>
+        </b-radio-button>
+
+        <b-radio-button v-model="sortBy" native-value="desc" type="is-link">
+          <b-icon icon="sort-descending"></b-icon>
+          <span>Desc</span>
+        </b-radio-button>
+      </b-field>
     </b-field>
     <b-field horizontal>
       <p class="control">
         <button class="button is-link is-outlined" @click="submit">
-          Apply settings
+          <slot name="button-label">
+            Apply settings
+          </slot>
         </button>
       </p>
     </b-field>
@@ -32,7 +45,18 @@
 
 <script>
 export default {
+  data() {
+    return {
+      sortBy: "asc"
+    };
+  },
   methods: {
+    validate(v) {
+      if (v !== undefined && v !== "" && !/^[0-9]+$/.test(v)) {
+        return ["must be only digit"];
+      }
+      return [];
+    },
     submit() {
       this.$refs.form.submit(d => {
         this.$emit("apply", {
@@ -50,7 +74,10 @@ export default {
               max: (parseInt(d.popularityMax) || 0) / 100
             }
           },
-          sort: parseInt(d.sort)
+          sort: {
+            By: d.sort.toLowerCase(),
+            Desc: this.sortBy === "desc"
+          }
         });
       });
     }

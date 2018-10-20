@@ -14,11 +14,23 @@
 
       <div class="navbar-menu" :class="menuOpened && 'is-active'">
         <div class="navbar-start">
+          <router-link class="navbar-item" to="/app/search">
+            <span class="icon">
+              <b-icon icon="magnify" size="is-small" />
+            </span>
+            <span>Search</span>
+          </router-link>
           <router-link class="navbar-item" to="/app/history">
-            History
+            <span class="icon">
+              <b-icon icon="history" size="is-small" />
+            </span>
+            <span>History</span>
           </router-link>
           <router-link class="navbar-item" to="/app/messages">
-            Messages
+            <span class="icon">
+              <b-icon icon="message" size="is-small" />
+            </span>
+            <span>Messages</span>
           </router-link>
         </div>
 
@@ -26,12 +38,14 @@
           <div class="navbar-item">
             <div class="field is-grouped">
               <div class="buttons">
-                <button class="button is-link is-outlined" @click="profile">
-                  <span class="icon">
-                    <b-icon icon="account" size="is-small" />
-                  </span>
-                  <span>Profile</span>
-                </button>
+                <router-link class="navbar-item" to="/app/profile/me">
+                  <button class="button is-link is-outlined">
+                    <span class="icon">
+                      <b-icon icon="account" size="is-small" />
+                    </span>
+                    <span>Profile</span>
+                  </button>
+                </router-link>
                 <notifications-dropdown />
                 <b-dropdown position="is-bottom-left">
                   <button class="button is-black is-outlined" slot="trigger">
@@ -78,9 +92,6 @@ export default {
   methods: {
     toggleMenu() {
       this.menuOpened = !this.menuOpened;
-    },
-    profile() {
-      this.$router.push("/app/profile/me");
     },
     accountEdit() {
       this.$router.push("/app/account/edit");

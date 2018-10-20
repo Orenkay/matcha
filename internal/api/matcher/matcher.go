@@ -210,33 +210,36 @@ type MatcherRequest struct {
 			Min float64 `json:"min"`
 		} `json:"popularity"`
 	}
+	Sort struct {
+		By   string
+		Desc bool
+	} `json:"sort"`
 	IsSuggestion bool
 }
 
 func (data *MatcherRequest) Bind(r *http.Request) error {
-	filtersJSON := r.URL.Query().Get("filters")
-	sortsJSON := r.URL.Query().Get("sorts")
 
-	if filtersJSON != "" {
+	if filtersJSON := r.URL.Query().Get("filters"); filtersJSON != "" {
 		if err := json.Unmarshal([]byte(filtersJSON), &data.Filters); err != nil {
 			return err
 		}
 		data.Filters.Distance.Max *= 1000
 		data.Filters.Distance.Min *= 1000
 	}
-	if sortsJSON != "" {
-		if err := json.Unmarshal([]byte(sortsJSON), &data.Filters); err != nil {
+
+	if sortJSON := r.URL.Query().Get("sort"); sortJSON != "" {
+		if err := json.Unmarshal([]byte(sortJSON), &data.Sort); err != nil {
 			return err
 		}
 	}
 
-	isSuggestion, err := strconv.ParseBool(r.URL.Query().Get("suggestion"))
+	var err error
+	data.IsSuggestion, err = strconv.ParseBool(r.URL.Query().Get("suggestion"))
 	{
 		if err != nil {
 			return err
 		}
 	}
-	data.IsSuggestion = isSuggestion
 	return nil
 }
 
@@ -275,6 +278,7 @@ func Matcher(s *store.Store) http.HandlerFunc {
 
 		matches, err := MatchableProfiles(s, up, func(mp *MatchedProfile) bool {
 			// age filters
+
 			age := int(time.Since(time.Unix(mp.Birthdate, 0)).Hours() / 24 / 365)
 			if data.Filters.Age.Max > 0 && age > data.Filters.Age.Max {
 				return false
@@ -317,16 +321,40 @@ func Matcher(s *store.Store) http.HandlerFunc {
 		}
 
 		matches = MatchedMergeSort(matches, func(a *MatchedProfile, b *MatchedProfile) bool {
-			aScore := -a.Distance
-			bScore := -b.Distance
 
-			aScore -= aScore * (interestsScore(interests, a.Interests) / 10)
-			bScore -= bScore * (interestsScore(interests, b.Interests) / 10)
+			var result bool
 
-			aScore -= aScore * (a.Popularity / 20)
-			bScore -= bScore * (b.Popularity / 20)
+			switch data.Sort.By {
+			case "distance":
+				result = a.Distance <= b.Distance
+				break
 
-			return aScore >= bScore
+			case "age":
+				result = a.Birthdate >= b.Birthdate
+				break
+
+			case "popularity":
+				result = a.Popularity <= b.Popularity
+				break
+
+			default:
+				aScore := -a.Distance
+				bScore := -b.Distance
+
+				aScore -= aScore * (interestsScore(interests, a.Interests) / 10)
+				bScore -= bScore * (interestsScore(interests, b.Interests) / 10)
+
+				aScore -= aScore * (a.Popularity / 20)
+				bScore -= bScore * (b.Popularity / 20)
+
+				result = aScore >= bScore
+				break
+			}
+
+			if data.Sort.Desc {
+				return !result
+			}
+			return result
 		})
 
 		var ids []int64
