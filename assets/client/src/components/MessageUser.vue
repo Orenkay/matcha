@@ -1,7 +1,11 @@
 <template>
-  <article class="media" v-if="userData !== undefined">
+  <article 
+    v-if="userData !== undefined" 
+    class="media">
     <figure class="media-left">
-      <div class="image is-64x64" :style="`background-image: url('${pp}')`"></div>
+      <div 
+        :style="`background-image: url('${pp}')`" 
+        class="image is-64x64"/>
     </figure>
     <div class="media-content">
       <div class="content">
@@ -15,23 +19,23 @@
 
 <script>
 export default {
-  props: ["target"],
+  props: ['target'],
   data() {
     return {
       userData: undefined
-    };
+    }
   },
   computed: {
     pp() {
-      return this.userData.pictures.find(p => p.isPP).path;
+      return this.userData.pictures.find(p => p.isPP).path
     }
   },
   created() {
-    this.$store.dispatch("getProfile", this.target).then(data => {
-      this.userData = data;
-    });
+    this.$store.dispatch('getProfile', this.target).then(data => {
+      this.userData = data
+    })
   }
-};
+}
 </script>
 
 <style scoped>

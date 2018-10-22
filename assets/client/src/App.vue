@@ -1,27 +1,32 @@
 <template>
   <div id="app">
-    <b-loading :is-full-page="true" :active="!isLoaded" />
-    <error-reporter v-if="globalError" :error="globalError" />
+    <b-loading 
+      :is-full-page="true" 
+      :active="!isLoaded" />
+    <error-reporter 
+      v-if="globalError" 
+      :error="globalError" />
     <router-view />
   </div>
 </template>
 
 <script>
-import ErrorReporter from "./components/ErrorReporter";
+import ErrorReporter from './components/ErrorReporter'
+
 export default {
-  name: "app",
+  name: 'App',
   components: {
     ErrorReporter
   },
   computed: {
     isLoaded() {
-      return this.$store.state.loaded;
+      return this.$store.state.loaded
     },
     globalError() {
-      return this.$store.state.error;
+      return this.$store.state.error
     }
   }
-};
+}
 </script>
 
 <style lang="scss">
@@ -33,7 +38,7 @@ body,
 }
 
 #app {
-  font-family: "Avenir", Helvetica, Arial, sans-serif;
+  font-family: 'Avenir', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   display: flex;

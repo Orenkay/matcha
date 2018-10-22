@@ -1,56 +1,64 @@
 <template>
-  <b-tooltip :label="tooltip" type="is-black" position="is-bottom">
-    <button class="button" @click="click" :disabled="loading || isReported">
-      <b-icon icon="alert" size="is-small" />
+  <b-tooltip 
+    :label="tooltip" 
+    type="is-black" 
+    position="is-bottom">
+    <button 
+      :disabled="loading || isReported" 
+      class="button" 
+      @click="click">
+      <b-icon 
+        icon="alert" 
+        size="is-small" />
     </button>
   </b-tooltip>
 </template>
 
 <script>
 export default {
-  props: ["target"],
-  created() {
-    this.fetchData();
-  },
+  props: ['target'],
   data() {
     return {
       isReported: false,
       loading: false
-    };
+    }
   },
   computed: {
     selfData() {
-      return this.$store.getters.userData;
+      return this.$store.getters.userData
     },
     tooltip() {
-      return this.isReported ? "Already reported" : "Report";
+      return this.isReported ? 'Already reported' : 'Report'
     }
+  },
+  created() {
+    this.fetchData()
   },
   methods: {
     fetchData() {
-      this.loading = true;
+      this.loading = true
       this.$http
         .get(`/report/${this.target}/reported`)
         .then(res => {
-          this.isReported = res.data.data;
+          this.isReported = res.data.data
         })
         .finally(() => {
-          this.loading = false;
-        });
+          this.loading = false
+        })
     },
     click() {
-      this.loading = true;
+      this.loading = true
       this.$http
         .post(`/report/${this.target}`)
         .then(() => {
-          this.isReported = true;
+          this.isReported = true
         })
         .finally(() => {
-          this.loading = false;
-        });
+          this.loading = false
+        })
     }
   }
-};
+}
 </script>
 
 <style scoped>

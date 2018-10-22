@@ -6,7 +6,7 @@ import * as VueGoogleMaps from 'vue2-google-maps'
 
 import BuefySteps from './plugins/buefy-steps'
 import MatchaForm from './plugins/matcha-form'
-import App from './App.vue'
+import App from './App'
 import store from './store'
 import router from './router'
 
@@ -25,8 +25,8 @@ Vue.use(VueGoogleMaps, {
 
 // Just an alias ...
 Vue.use({
-  install (Vue) {
-    Vue.prototype.$toast.error = function (message) {
+  install(Vue) {
+    Vue.prototype.$toast.error = function(message) {
       this.open({
         type: 'is-danger',
         queue: false,

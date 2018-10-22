@@ -1,18 +1,27 @@
 <template>
   <b-dropdown position="is-bottom-left">
     <div slot="trigger">
-      <span class="bulle" v-if="displayBulle">{{count}}</span>
+      <span 
+        v-if="displayBulle" 
+        class="bulle">{{ count }}</span>
       <button class="button is-black is-outlined">
         <span class="icon">
-          <b-icon icon="bell" size="is-small" />
+          <b-icon 
+            icon="bell" 
+            size="is-small" />
         </span>
       </button>
     </div>
     <b-dropdown-item @click="clear">
-      <b-icon icon="delete" size="is-small" />
+      <b-icon 
+        icon="delete" 
+        size="is-small" />
       <span>Clear all notifications</span>
     </b-dropdown-item>
-    <b-dropdown-item v-for="(notif, index) in notifications" :key="index" @click="trigger(index, notif)">
+    <b-dropdown-item 
+      v-for="(notif, index) in notifications" 
+      :key="index" 
+      @click="trigger(index, notif)">
       <span>{{ notif.message }}</span>
     </b-dropdown-item>
   </b-dropdown>
@@ -22,28 +31,28 @@
 export default {
   computed: {
     notifications() {
-      return this.$store.getters.notifications;
+      return this.$store.getters.notifications
     },
     displayBulle() {
-      return this.notifications.length > 0;
+      return this.notifications.length > 0
     },
     count() {
-      const count = this.notifications.length;
-      return count < 10 ? count : "9+";
+      const count = this.notifications.length
+      return count < 10 ? count : '9+'
     }
   },
   methods: {
     trigger(id, n) {
-      this.$store.commit("removeNotification", id);
+      this.$store.commit('removeNotification', id)
       if (n.to) {
-        this.$router.push(n.to);
+        this.$router.push(n.to)
       }
     },
     clear() {
-      this.$store.commit("clearNotifications");
+      this.$store.commit('clearNotifications')
     }
   }
-};
+}
 </script>
 
 <style scoped>

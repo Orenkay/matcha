@@ -1,17 +1,31 @@
 <template>
   <section class="section">
     <b-steps :index="currentStep">
-      <b-step-item title="Personal Informations" :next="step1next">
+      <b-step-item 
+        :next="step1next" 
+        title="Personal Informations">
         <personal-form ref="personalForm" />
       </b-step-item>
-      <b-step-item title="Your Interests" :next="step2next">
-        <user-interests :editable="true" :tags="userData.interests" />
+      <b-step-item 
+        :next="step2next" 
+        title="Your Interests">
+        <user-interests 
+          :editable="true" 
+          :tags="userData.interests" />
       </b-step-item>
-      <b-step-item title="Your Pictures" :next="step3next">
-        <user-pictures :editable="true" :pictures="userData.pictures" />
+      <b-step-item 
+        :next="step3next" 
+        title="Your Pictures">
+        <user-pictures 
+          :editable="true" 
+          :pictures="userData.pictures" />
       </b-step-item>
-      <b-step-item title="Your Location" :next="step4next">
-        <user-location :editable="true" :location="userData.loc" />
+      <b-step-item 
+        :next="step4next" 
+        title="Your Location">
+        <user-location 
+          :editable="true" 
+          :location="userData.loc" />
       </b-step-item>
       <b-step-item title="Done!">
         <div class="has-text-centered">
@@ -24,10 +38,10 @@
 </template>
 
 <script>
-import PersonalForm from "../../components/forms/PersonalForm";
-import UserLocation from "../../components/UserLocation";
-import UserPictures from "../../components/UserPictures";
-import UserInterests from "../../components/UserInterests";
+import PersonalForm from '../../components/forms/PersonalForm'
+import UserLocation from '../../components/UserLocation'
+import UserPictures from '../../components/UserPictures'
+import UserInterests from '../../components/UserInterests'
 
 export default {
   components: {
@@ -38,37 +52,37 @@ export default {
   },
   computed: {
     userData() {
-      return this.$store.getters.userData;
+      return this.$store.getters.userData
     },
     currentStep() {
-      if (this.userData.profile.lastName === undefined) return 0;
-      if (this.userData.interests.length === 0) return 1;
-      if (this.userData.pictures.findIndex(p => p.isPP) < 0) return 2;
-      if (this.userData.loc.address === undefined) return 3;
+      if (this.userData.profile.lastName === undefined) return 0
+      if (this.userData.interests.length === 0) return 1
+      if (this.userData.pictures.findIndex(p => p.isPP) < 0) return 2
+      if (this.userData.loc.address === undefined) return 3
     }
   },
   methods: {
     step1next(next) {
-      this.$refs.personalForm.submit(next);
+      this.$refs.personalForm.submit(next)
     },
     step2next(next) {
       if (this.userData.interests.length === 0) {
-        return this.$toast.error("You must add atleast one interest");
+        return this.$toast.error('You must add atleast one interest')
       }
-      next();
+      next()
     },
     step3next(next) {
       if (this.userData.pictures.findIndex(p => p.isPP) < 0) {
-        return this.$toast.error("You must have atleast one PP");
+        return this.$toast.error('You must have atleast one PP')
       }
-      next();
+      next()
     },
     step4next(next) {
       if (this.userData.loc.address === undefined) {
-        return this.$toast.error("You must set your location");
+        return this.$toast.error('You must set your location')
       }
-      next();
+      next()
     }
   }
-};
+}
 </script>

@@ -1,6 +1,7 @@
 package mail
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -18,6 +19,7 @@ func SendMail(subject, text string, to ...string) error {
 		text,
 		to...,
 	)
+	m.SetHtml("<html><body>" + text + "</body></html>")
 	_, _, err := mg.Send(m)
 	return err
 }
@@ -36,4 +38,31 @@ func SendValidationMail(r *http.Request, s *store.Store, user *store.User) error
 
 	link := "http://" + r.Host + "/users/" + strconv.Itoa(int(user.ID)) + "/validate/" + code
 	return SendMail("Validation", link, user.Email)
+}
+
+func SendPassReset(s *store.Store, user *store.User) error {
+	code, err := crypto.RandToken(32)
+	{
+		if err != nil {
+			return err
+		}
+	}
+	user.Password, err = crypto.EncryptPassword(code)
+	{
+		if err != nil {
+			return err
+		}
+	}
+	msg := `
+		Your password has been reseted<br />
+		Your new Password is<br />
+		%s
+		<br />
+		<br />
+		You should edit it!
+	`
+	if err := SendMail("Password reset", fmt.Sprintf(msg, code), user.Email); err != nil {
+		return err
+	}
+	return s.UserService.Update(user)
 }

@@ -4,7 +4,6 @@ import (
 	"database/sql"
 
 	"github.com/go-redis/redis"
-
 	"github.com/orenkay/matcha/internal/server"
 	"github.com/orenkay/matcha/internal/store"
 	"github.com/orenkay/matcha/internal/store/cache"
@@ -53,5 +52,4 @@ func main() {
 
 	server := server.New(s)
 	server.Run("0.0.0.0:3000")
-
 }

@@ -69,9 +69,9 @@ type Message struct {
 }
 
 type Like struct {
-	ID       int64 `json:"-"`
-	UserID   int64 `json:"-"`
-	TargetID int64 `json:"-"`
+	ID       int64 `json:"id"`
+	UserID   int64 `json:"userId"`
+	TargetID int64 `json:"targetId"`
 }
 
 type UserService interface {
@@ -201,8 +201,9 @@ type NotificationService interface {
 
 type AuthTokenService interface {
 	Token(tokenString string) (*jwt.Token, error)
-	Add(tokenString string, token *jwt.Token) error
+	Add(tokenString string, userID int64) error
 	Delete(tokenString string) error
+	DeleteByUserID(userID int64) error
 }
 
 type Store struct {

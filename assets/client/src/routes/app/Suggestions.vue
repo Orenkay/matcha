@@ -1,13 +1,19 @@
 <template>
   <div>
-    <b-collapse class="filter-collapse" :open="false">
-      <div slot="trigger" slot-scope="props" class="card-header">
+    <b-collapse 
+      :open="false" 
+      class="filter-collapse">
+      <div 
+        slot="trigger" 
+        slot-scope="props" 
+        class="card-header">
         <p class="card-header-title">
           Advanced settings
         </p>
         <a class="card-header-icon">
-          <b-icon :icon="props.open ? 'menu-down' : 'menu-up'" type="is-black">
-          </b-icon>
+          <b-icon 
+            :icon="props.open ? 'menu-down' : 'menu-up'" 
+            type="is-black"/>
         </a>
       </div>
       <div class="notification">
@@ -16,23 +22,32 @@
         </div>
       </div>
     </b-collapse>
-    <br />
-    <router-link v-for="(s, index) in suggestions" :key="index" :to="`/app/profile/${s.profile.userId}`">
+    <br >
+    <router-link 
+      v-for="(s, index) in suggestions" 
+      :key="index" 
+      :to="`/app/profile/${s.profile.userId}`">
       <article class="media">
         <figure class="media-left">
-          <div class="image is-64x64" :style="`background-image: url('${s.pp}')`"></div>
+          <div 
+            :style="`background-image: url('${s.pp}')`" 
+            class="image is-64x64"/>
         </figure>
         <div class="media-content">
           <div class="content">
             <p>
               <span>
-                <span>{{s.profile.lastName }}</span>
-                <span>{{ s.profile.firstName}}</span>
+                <span>{{ s.profile.lastName }}</span>
+                <span>{{ s.profile.firstName }}</span>
                 <span class="meta">
                   <span>{{ s.profile.age }} yo</span>
-                  <b-tooltip label="popularity" type="is-black">
+                  <b-tooltip 
+                    label="popularity" 
+                    type="is-black">
                     <span class="popularity">
-                      <b-icon icon="star" size="is-small" />
+                      <b-icon 
+                        icon="star" 
+                        size="is-small" />
                       <span>{{ Math.trunc(100 * s.popularity) }}%</span>
                     </span>
                   </b-tooltip>
@@ -49,60 +64,60 @@
 </template>
 
 <script>
-import moment from "moment";
-import UserInterests from "../../components/UserInterests";
-import UserLocation from "../../components/UserLocation";
-import FiltersForm from "../../components/forms/FiltersForm";
+import moment from 'moment'
+import UserInterests from '../../components/UserInterests'
+import UserLocation from '../../components/UserLocation'
+import FiltersForm from '../../components/forms/FiltersForm'
 export default {
   components: {
     UserInterests,
     UserLocation,
     FiltersForm
   },
-  created() {
-    this.fetchData();
-  },
   data() {
     return {
       suggestions: []
-    };
+    }
+  },
+  created() {
+    this.fetchData()
   },
   methods: {
     filtersApply(params) {
-      this.fetchData(params);
+      this.fetchData(params)
     },
     fetchData(params) {
-      params = Object.assign(params || {}, { suggestion: true });
-      this.$http.get("/matcher/0", { params }).then(res => {
+      params = Object.assign(params || {}, { suggestion: true })
+      this.$http.get('/matcher/0', { params }).then(res => {
         if (!res.data.data) {
-          this.suggestions = [];
-          return;
+          this.suggestions = []
+          return
         }
         Promise.all(
           res.data.data.map(
             (targetId, i) =>
               new Promise((resolve, reject) => {
-                this.$store.dispatch("getProfile", targetId).then(data => {
-                  data.pp = data.pictures.find(p => p.isPP).path;
+                this.$store.dispatch('getProfile', targetId).then(data => {
+                  data.pp = data.pictures.find(p => p.isPP).path
                   data.profile.age = moment().diff(
                     data.profile.birthdate * 1000,
-                    "years",
+                    'years',
                     false
-                  );
-                  resolve(data);
-                });
+                  )
+                  resolve(data)
+                })
               })
           )
         ).then(suggestions => {
-          this.suggestions = suggestions;
-        });
-      });
+          this.suggestions = suggestions
+        })
+      })
     },
     goto(id) {
-      this.$router.push("/app/profile/" + id);
+      this.$router.push('/app/profile/' + id)
     }
   }
-};
+}
 </script>
 
 <style scoped lang="scss">

@@ -55,7 +55,7 @@ type ValidationErrorDetail struct {
 }
 
 type ValidationError struct {
-	errors        int `json:"-"`
+	errors        int
 	internalError *error
 	Validation    struct {
 		Details []ValidationErrorDetail `json:"details"`
@@ -83,7 +83,7 @@ func (e *ValidationError) InternalError(err error) {
 }
 
 func (e *ValidationError) Error() string {
-	return "TODO: ValidationError.Error() implementation"
+	return "ValidationError"
 }
 
 func ErrInvalidRequest(err error) render.Renderer {

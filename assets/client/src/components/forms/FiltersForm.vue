@@ -1,39 +1,82 @@
 <template>
   <m-form ref="form">
-    <b-field horizontal label="Distance">
-      <m-form-field name="distanceMin" type="input" :validate="validate" :props="{placeholder: 'Min'}" />
-      <m-form-field name="distanceMax" type="input" :validate="validate" :props="{placeholder: 'Max'}" />
+    <b-field 
+      horizontal 
+      label="Distance">
+      <m-form-field 
+        :validate="validate" 
+        :props="{placeholder: 'Min'}" 
+        name="distanceMin" 
+        type="input" />
+      <m-form-field 
+        :validate="validate" 
+        :props="{placeholder: 'Max'}" 
+        name="distanceMax" 
+        type="input" />
     </b-field>
-    <b-field horizontal label="Age">
-      <m-form-field name="ageMin" type="input" :validate="validate" :props="{placeholder: 'Min'}" />
-      <m-form-field name="ageMax" type="input" :validate="validate" :props="{placeholder: 'Max'}" />
+    <b-field 
+      horizontal 
+      label="Age">
+      <m-form-field 
+        :validate="validate" 
+        :props="{placeholder: 'Min'}" 
+        name="ageMin" 
+        type="input" />
+      <m-form-field 
+        :validate="validate" 
+        :props="{placeholder: 'Max'}" 
+        name="ageMax" 
+        type="input" />
     </b-field>
-    <b-field horizontal label="Popularity">
-      <m-form-field name="popularityMin" type="input" :validate="validate" :props="{placeholder: 'Min'}" />
-      <m-form-field name="popularityMax" type="input" :validate="validate" :props="{placeholder: 'Max'}" />
+    <b-field 
+      horizontal 
+      label="Popularity">
+      <m-form-field 
+        :validate="validate" 
+        :props="{placeholder: 'Min'}" 
+        name="popularityMin" 
+        type="input" />
+      <m-form-field 
+        :validate="validate" 
+        :props="{placeholder: 'Max'}" 
+        name="popularityMax" 
+        type="input" />
     </b-field>
-    <b-field horizontal label="Sort by">
+    <b-field 
+      horizontal 
+      label="Sort by">
       <b-field>
-        <m-form-field type="select" name="sort" value="Default">
+        <m-form-field 
+          type="select" 
+          name="sort" 
+          value="Default">
           <option>Default</option>
           <option>Distance</option>
           <option>Age</option>
           <option>Popularity</option>
         </m-form-field>
-        <b-radio-button v-model="sortBy" native-value="asc" type="is-link">
-          <b-icon icon="sort-ascending"></b-icon>
+        <b-radio-button 
+          v-model="sortBy" 
+          native-value="asc" 
+          type="is-link">
+          <b-icon icon="sort-ascending"/>
           <span>Asc</span>
         </b-radio-button>
 
-        <b-radio-button v-model="sortBy" native-value="desc" type="is-link">
-          <b-icon icon="sort-descending"></b-icon>
+        <b-radio-button 
+          v-model="sortBy" 
+          native-value="desc" 
+          type="is-link">
+          <b-icon icon="sort-descending"/>
           <span>Desc</span>
         </b-radio-button>
       </b-field>
     </b-field>
     <b-field horizontal>
       <p class="control">
-        <button class="button is-link is-outlined" @click="submit">
+        <button 
+          class="button is-link is-outlined" 
+          @click="submit">
           <slot name="button-label">
             Apply settings
           </slot>
@@ -47,19 +90,19 @@
 export default {
   data() {
     return {
-      sortBy: "asc"
-    };
+      sortBy: 'asc'
+    }
   },
   methods: {
     validate(v) {
-      if (v !== undefined && v !== "" && !/^[0-9]+$/.test(v)) {
-        return ["must be only digit"];
+      if (v !== undefined && v !== '' && !/^[0-9]+$/.test(v)) {
+        return ['must be only digit']
       }
-      return [];
+      return []
     },
     submit() {
       this.$refs.form.submit(d => {
-        this.$emit("apply", {
+        this.$emit('apply', {
           filters: {
             distance: {
               min: parseInt(d.distanceMin) || 0,
@@ -76,13 +119,13 @@ export default {
           },
           sort: {
             By: d.sort.toLowerCase(),
-            Desc: this.sortBy === "desc"
+            Desc: this.sortBy === 'desc'
           }
-        });
-      });
+        })
+      })
     }
   }
-};
+}
 </script>
 
 <style>

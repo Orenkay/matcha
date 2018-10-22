@@ -1,62 +1,71 @@
 <template>
-  <b-tooltip :label="tooltip" type="is-black" position="is-bottom">
-    <button class="button" :class="classes" @click="click" :disabled="loading">
-      <b-icon icon="block-helper" size="is-small" />
+  <b-tooltip 
+    :label="tooltip" 
+    type="is-black" 
+    position="is-bottom">
+    <button 
+      :class="classes" 
+      :disabled="loading" 
+      class="button" 
+      @click="click">
+      <b-icon 
+        icon="block-helper" 
+        size="is-small" />
     </button>
   </b-tooltip>
 </template>
 
 <script>
 export default {
-  props: ["target"],
-  created() {
-    this.fetchData();
-  },
+  props: ['target'],
   data() {
     return {
       isBlocked: false,
       loading: false
-    };
+    }
   },
   computed: {
     selfData() {
-      return this.$store.getters.userData;
+      return this.$store.getters.userData
     },
     tooltip() {
-      return this.isBlocked ? "Un-Block" : "Block";
+      return this.isBlocked ? 'Un-Block' : 'Block'
     },
     classes() {
-      return [this.isBlocked && "is-danger"];
+      return [this.isBlocked && 'is-danger']
     }
+  },
+  created() {
+    this.fetchData()
   },
   methods: {
     fetchData() {
-      this.loading = true;
+      this.loading = true
       this.$http
         .get(`/block/${this.target}/blocked`)
         .then(res => {
-          this.isBlocked = res.data.data;
+          this.isBlocked = res.data.data
         })
         .finally(() => {
-          this.loading = false;
-        });
+          this.loading = false
+        })
     },
     click() {
-      this.loading = true;
+      this.loading = true
       const req = !this.isBlocked
         ? this.$http.post(`/block/${this.target}`)
-        : this.$http.delete(`/block/${this.target}`);
+        : this.$http.delete(`/block/${this.target}`)
       req
         .then(() => {
-          this.isBlocked = !this.isBlocked;
-          this.$store.dispatch("removeMessageFrom", this.target);
+          this.isBlocked = !this.isBlocked
+          this.$store.dispatch('removeMessageFrom', this.target)
         })
         .finally(() => {
-          this.loading = false;
-        });
+          this.loading = false
+        })
     }
   }
-};
+}
 </script>
 
 <style scoped>

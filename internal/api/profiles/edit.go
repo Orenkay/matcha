@@ -8,27 +8,13 @@ import (
 	"github.com/orenkay/matcha/internal/store"
 )
 
-type EditRequest struct {
-	LastName   string `json:"lastName"`
-	FirstName  string `json:"firstName"`
-	Birthdate  string `json:"birthDate"`
-	Gender     string `json:"gender"`
-	Attraction string `json:"attraction"`
-	Bio        string `json:"bio"`
-}
-
-func (data *EditRequest) Bind(r *http.Request) error {
-	// todo: Validation
-	return nil
-}
-
 // Create handle PUT /profiles/edit requests
 func Edit(s *store.Store) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		user := r.Context().Value("user").(*store.User)
 		data := &CreateRequest{}
 		if err := render.Bind(r, data); err != nil {
-			render.Render(w, r, api.ErrInvalidRequest(err))
+			render.Render(w, r, api.ErrValidation(err))
 			return
 		}
 		profile, err := s.ProfileService.Profile(user.ID)

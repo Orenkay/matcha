@@ -8,6 +8,7 @@ import (
 	"github.com/orenkay/matcha/internal/api"
 	"github.com/orenkay/matcha/internal/crypto"
 	"github.com/orenkay/matcha/internal/store"
+	"github.com/orenkay/matcha/internal/validations"
 )
 
 type PasswordEditRequest struct {
@@ -19,9 +20,7 @@ func (data *PasswordEditRequest) Bind(r *http.Request) error {
 	ve := &api.ValidationError{}
 	ve.Validation.Source = "register"
 
-	if len(data.Password) < 4 || len(data.Password) > 32 {
-		ve.Add("pass", "Password length must be between 4 and 32 included.")
-	}
+	validations.Password(ve, data.Password)
 
 	if ve.Len() > 0 {
 		return ve

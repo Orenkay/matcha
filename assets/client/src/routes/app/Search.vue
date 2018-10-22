@@ -1,6 +1,8 @@
 <template>
   <div>
-    <b-collapse class="filter-collapse" :open="true">
+    <b-collapse 
+      :open="true" 
+      class="filter-collapse">
       <div class="notification">
         <div class="content">
           <filters-form @apply="filtersApply">
@@ -9,23 +11,32 @@
         </div>
       </div>
     </b-collapse>
-    <br />
-    <router-link v-for="(s, index) in searches" :key="index" :to="`/app/profile/${s.profile.userId}`">
+    <br >
+    <router-link 
+      v-for="(s, index) in searches" 
+      :key="index" 
+      :to="`/app/profile/${s.profile.userId}`">
       <article class="media">
         <figure class="media-left">
-          <div class="image is-64x64" :style="`background-image: url('${s.pp}')`"></div>
+          <div 
+            :style="`background-image: url('${s.pp}')`" 
+            class="image is-64x64"/>
         </figure>
         <div class="media-content">
           <div class="content">
             <p>
               <span>
-                <span>{{s.profile.lastName }}</span>
-                <span>{{ s.profile.firstName}}</span>
+                <span>{{ s.profile.lastName }}</span>
+                <span>{{ s.profile.firstName }}</span>
                 <span class="meta">
                   <span>{{ s.profile.age }} yo</span>
-                  <b-tooltip label="popularity" type="is-black">
+                  <b-tooltip 
+                    label="popularity" 
+                    type="is-black">
                     <span class="popularity">
-                      <b-icon icon="star" size="is-small" />
+                      <b-icon 
+                        icon="star" 
+                        size="is-small" />
                       <span>{{ Math.trunc(100 * s.popularity) }}%</span>
                     </span>
                   </b-tooltip>
@@ -42,10 +53,10 @@
 </template>
 
 <script>
-import moment from "moment";
-import UserInterests from "../../components/UserInterests";
-import UserLocation from "../../components/UserLocation";
-import FiltersForm from "../../components/forms/FiltersForm";
+import moment from 'moment'
+import UserInterests from '../../components/UserInterests'
+import UserLocation from '../../components/UserLocation'
+import FiltersForm from '../../components/forms/FiltersForm'
 export default {
   components: {
     UserInterests,
@@ -55,44 +66,44 @@ export default {
   data() {
     return {
       searches: []
-    };
+    }
   },
   methods: {
     filtersApply(params) {
-      this.fetchData(params);
+      this.fetchData(params)
     },
     fetchData(params) {
-      params = Object.assign(params || {}, { suggestion: false });
-      this.$http.get("/matcher/1", { params }).then(res => {
+      params = Object.assign(params || {}, { suggestion: false })
+      this.$http.get('/matcher/1', { params }).then(res => {
         if (!res.data.data) {
-          this.searches = [];
-          return;
+          this.searches = []
+          return
         }
         Promise.all(
           res.data.data.map(
             (targetId, i) =>
               new Promise((resolve, reject) => {
-                this.$store.dispatch("getProfile", targetId).then(data => {
-                  data.pp = data.pictures.find(p => p.isPP).path;
+                this.$store.dispatch('getProfile', targetId).then(data => {
+                  data.pp = data.pictures.find(p => p.isPP).path
                   data.profile.age = moment().diff(
                     data.profile.birthdate * 1000,
-                    "years",
+                    'years',
                     false
-                  );
-                  resolve(data);
-                });
+                  )
+                  resolve(data)
+                })
               })
           )
         ).then(searches => {
-          this.searches = searches;
-        });
-      });
+          this.searches = searches
+        })
+      })
     },
     goto(id) {
-      this.$router.push("/app/profile/" + id);
+      this.$router.push('/app/profile/' + id)
     }
   }
-};
+}
 </script>
 
 <style scoped lang="scss">

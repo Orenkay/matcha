@@ -90,7 +90,9 @@ const store = new Vuex.Store({
           if (res.data.data === null) {
             res.data.data = []
           }
-          store.state.messages[id] = res.data.data.sort((a, b) => a.date > b.date)
+          store.state.messages[id] = res.data.data.sort(
+            (a, b) => a.date > b.date
+          )
           return resolve(store.state.messages[id])
         })
       })
@@ -101,7 +103,8 @@ const store = new Vuex.Store({
           return resolve()
         }
         store.state.loaded = false
-        axios.get('/users/me', { timeout: 5000 })
+        axios
+          .get('/users/me', { timeout: 5000 })
           .then(res => {
             const data = res.data.data
             store.state.loaded = true
@@ -115,7 +118,7 @@ const store = new Vuex.Store({
 
             resolve()
           })
-          .catch((err) => {
+          .catch(err => {
             if (err.response && err.response.status === 401) {
               store.state.loaded = true
               store.commit('logout')
@@ -131,7 +134,7 @@ const store = new Vuex.Store({
             store.commit('logout')
             resolve()
           })
-          .catch((err) => {
+          .catch(err => {
             reject(err)
           })
       })
@@ -139,10 +142,12 @@ const store = new Vuex.Store({
   },
   getters: {
     inited: state => {
-      return state.userData.profile.firstName !== undefined &&
+      return (
+        state.userData.profile.firstName !== undefined &&
         state.userData.loc.address !== undefined &&
         state.userData.pictures.findIndex(p => p.isPP) >= 0 &&
         state.userData.interests.length
+      )
     },
     notifications: state => {
       return state.notifications
@@ -202,7 +207,7 @@ const store = new Vuex.Store({
       cookies.set('auth-token', token)
       router.replace('/app')
     },
-    logout: (state) => {
+    logout: state => {
       state.authToken = undefined
       cookies.remove('auth-token')
       router.replace('/')

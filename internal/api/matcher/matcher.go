@@ -68,6 +68,13 @@ func MatchableProfiles(s *store.Store, up *store.Profile, h FilterHelper) ([]*Ma
 			continue
 		}
 
+		ignored, err := s.IgnoreService.Ignored(up.UserID, p.UserID)
+		{
+			if ignored || err != nil {
+				continue
+			}
+		}
+
 		if !IsMatchable(up, p) {
 			continue
 		}

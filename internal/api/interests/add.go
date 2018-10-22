@@ -16,6 +16,9 @@ type AddRequest struct {
 
 func (data *AddRequest) Bind(r *http.Request) error {
 	data.Value = strings.ToLower(data.Value)
+	if len(data.Value) < 2 {
+		return errors.New("Interest must be atleast 2 chars long")
+	}
 	return nil
 }
 
@@ -25,11 +28,6 @@ func Add(s *store.Store) http.HandlerFunc {
 		data := &AddRequest{}
 		if err := render.Bind(r, data); err != nil {
 			render.Render(w, r, api.ErrInvalidRequest(err))
-			return
-		}
-
-		if len(data.Value) < 2 {
-			render.Render(w, r, api.ErrInvalidRequest(errors.New("Interest must be atleast 2 chars long")))
 			return
 		}
 

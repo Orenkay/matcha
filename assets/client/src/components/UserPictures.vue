@@ -2,29 +2,51 @@
   <div>
     <div v-if="onlyPP">
       <figure>
-        <div class="image pp is-rounded" :style="`background-image: url('${pp.path}');'`"></div>
+        <div 
+          :style="`background-image: url('${pp.path}');'`" 
+          class="image pp is-rounded"/>
       </figure>
     </div>
     <div v-else>
       <div class="has-text-centered">
-        <figure v-for="(pic, index) in pictures" :key="index" class="image" :class="pic.isPP && 'pp'">
+        <figure 
+          v-for="(pic, index) in pictures" 
+          :key="index" 
+          :class="pic.isPP && 'pp'" 
+          class="image">
           <div class="edit-overlay">
             <div class="edit-overlay-content">
-              <div class="button close-button" @click="updatePP(pic.id)">
-                <b-icon icon="star" size="is-small" />
+              <div 
+                class="button close-button" 
+                @click="updatePP(pic.id)">
+                <b-icon 
+                  icon="star" 
+                  size="is-small" />
               </div>
-              <div class="button close-button" @click="remove(pic.id)">
-                <b-icon icon="close" size="is-small" />
+              <div 
+                class="button close-button" 
+                @click="remove(pic.id)">
+                <b-icon 
+                  icon="close" 
+                  size="is-small" />
               </div>
             </div>
           </div>
-          <div class="image" :class="pic.isPP && 'pp'" :style="`background-image: url('${pic.path}');`"></div>
+          <div 
+            :class="pic.isPP && 'pp'" 
+            :style="`background-image: url('${pic.path}');`" 
+            class="image"/>
         </figure>
       </div>
-      <b-field v-if="editable" class="file is-centered" position="is-centered">
-        <b-upload v-model="file" @input="upload">
+      <b-field 
+        v-if="editable" 
+        class="file is-centered" 
+        position="is-centered">
+        <b-upload 
+          v-model="file" 
+          @input="upload">
           <a class="button is-primary">
-            <b-icon icon="upload"></b-icon>
+            <b-icon icon="upload"/>
             <span>Click to upload</span>
           </a>
         </b-upload>
@@ -35,46 +57,46 @@
 
 <script>
 export default {
-  props: ["onlyPP", "pictures", "editable"],
+  props: ['onlyPP', 'pictures', 'editable'],
   data() {
     return {
       file: null
-    };
+    }
   },
   computed: {
     pp() {
-      return this.pictures.find(p => p.isPP);
+      return this.pictures.find(p => p.isPP)
     }
   },
   methods: {
     upload(file) {
-      const formData = new FormData();
-      formData.append("picture", file[0]);
+      const formData = new FormData()
+      formData.append('picture', file[0])
       this.$http
-        .post("/pictures/me", formData, {
-          "Content-Type": "multipart/form-data"
+        .post('/pictures/me', formData, {
+          'Content-Type': 'multipart/form-data'
         })
         .then(res => {
-          this.$store.commit("addPicture", res.data.data);
+          this.$store.commit('addPicture', res.data.data)
         })
         .catch(err => {
           if (err.response && err.response.status === 400) {
-            this.$toast.error(err.response.data.error);
+            this.$toast.error(err.response.data.error)
           }
-        });
+        })
     },
     remove(id) {
       this.$http.delete(`/pictures/me/${id}`).then(res => {
-        this.$store.commit("removePicture", id);
-      });
+        this.$store.commit('removePicture', id)
+      })
     },
     updatePP(id) {
       this.$http.patch(`/pictures/me/${id}/pp`).then(res => {
-        this.$store.commit("setPP", id);
-      });
+        this.$store.commit('setPP', id)
+      })
     }
   }
-};
+}
 </script>
 
 <style lang="scss" scoped>

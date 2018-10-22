@@ -6,41 +6,43 @@
       <h2 class="subtitle">
         {{ displayError() }}
       </h2>
-      <button class="button" @click="retry">Click here to reload the page</button>
+      <button 
+        class="button" 
+        @click="retry">Click here to reload the page</button>
     </section>
   </div>
 </template>
 
 <script>
 export default {
-  props: ["error"],
+  props: ['error'],
   methods: {
     retry() {
-      this.$router.go();
+      this.$router.go()
     },
     displayError() {
-      if (RegExp("Network Error").test(this.error)) {
-        return "Request response is empty, please check your connection internet";
+      if (RegExp('Network Error').test(this.error)) {
+        return 'Request response is empty, please check your connection internet'
       }
       if (this.error.response !== undefined) {
         if (this.error.response.status === 401) {
-          return `You are not authorized to access this place`;
+          return `You are not authorized to access this place`
         }
-        return `Unknwon error. Code: ${this.error.response.status}`;
+        return `Unknwon error. Code: ${this.error.response.status}`
       }
-      return `Unknown error.`;
+      return `Unknown error.`
     },
     errorType() {
-      if (RegExp("Network Error").test(this.error)) {
-        return "Network Error";
+      if (RegExp('Network Error').test(this.error)) {
+        return 'Network Error'
       }
       if (this.error.response !== undefined) {
-        return "Request Error";
+        return 'Request Error'
       }
-      return "Error";
+      return 'Error'
     }
   }
-};
+}
 </script>
 
 <style scoped>

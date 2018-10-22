@@ -10,6 +10,7 @@ import (
 	"github.com/go-chi/render"
 	"github.com/orenkay/matcha/internal/api"
 	"github.com/orenkay/matcha/internal/store"
+	"github.com/orenkay/matcha/internal/validations"
 )
 
 type SendRequest struct {
@@ -17,6 +18,15 @@ type SendRequest struct {
 }
 
 func (data *SendRequest) Bind(r *http.Request) error {
+	ve := &api.ValidationError{}
+	ve.Validation.Source = "messages"
+
+	validations.Message(ve, data.Message)
+
+	if ve.Len() > 0 {
+		return ve
+	}
+
 	return nil
 }
 
