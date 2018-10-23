@@ -15,7 +15,7 @@ instance.interceptors.request.use(function(config) {
 
 instance.interceptors.response.use(null, function(err) {
   if (!err.response || err.response.status === 500) {
-    //    store.commit('setError', err)
+    store.commit('setError', err)
   }
   return Promise.reject(err)
 })
