@@ -5,7 +5,7 @@ import VueAxios from 'vue-axios'
 import store from './store'
 
 const instance = axios.create({
-  baseURL: 'http://192.168.99.100:3000'
+  baseURL: 'http://192.168.99.100:3000/'
 })
 
 instance.interceptors.request.use(function(config) {

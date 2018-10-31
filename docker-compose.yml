@@ -32,5 +32,7 @@ services:
     restart: always
     build: ./assets/client
     image: matcha-client
+    links:
+      - matcha
     ports:
       - "80:80"

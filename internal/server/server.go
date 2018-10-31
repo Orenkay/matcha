@@ -32,7 +32,7 @@ func New(store *store.Store) *Server {
 	router := chi.NewRouter()
 
 	cors := cors.New(cors.Options{
-		AllowedOrigins:   []string{"http://192.168.1.242:8080", "http://0.0.0.0:8080" /* TODO: remove me later: */, "*"},
+		AllowedOrigins:   []string{"*"},
 		AllowCredentials: true,
 		AllowedMethods:   []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
 		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token", "X-Auth-Token"},
@@ -41,7 +41,7 @@ func New(store *store.Store) *Server {
 	// init middlewares
 	router.Use(cors.Handler)
 	router.Use(middleware.RequestID)
-	// router.Use(middleware.Logger)
+	router.Use(middleware.Logger)
 	router.Use(middleware.Recoverer)
 	router.Use(middleware.URLFormat)
 	router.Use(render.SetContentType(render.ContentTypeJSON))
