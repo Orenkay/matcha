@@ -17,8 +17,6 @@ services:
     restart: always
     build: .
     image: matcha
-    volumes:
-      - .:/go/src/github.com/orenkay/matcha
     command: ["./wait-for-it.sh", "postgres:5432", "--", "go", "run", "./cmd/matcha/main.go"]
     links:
       - postgres
