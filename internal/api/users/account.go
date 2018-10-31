@@ -46,14 +46,33 @@ func Account(s *store.Store) http.HandlerFunc {
 				return
 			}
 		}
+		likes, err := s.LikesService.Count(user.ID)
+		{
+			if err != nil {
+				render.Render(w, r, api.ErrInternal(err))
+				return
+			}
+		}
+		visites, err := s.HistoryService.Count(user.ID)
+		{
+			if err != nil {
+				render.Render(w, r, api.ErrInternal(err))
+				return
+			}
+		}
+		var popularity float64
+		if visites > 0 {
+			popularity = float64(likes) / float64(visites)
+		}
 		render.Render(w, r, api.DefaultResponse(http.StatusOK, render.M{
 			"account": user,
 			"meta": render.M{
-				"profile":   profile,
-				"loc":       loc,
-				"interests": interests,
-				"pictures":  pictures,
-				"matches":   matches,
+				"profile":    profile,
+				"loc":        loc,
+				"interests":  interests,
+				"pictures":   pictures,
+				"matches":    matches,
+				"popularity": popularity,
 			},
 		}))
 	})

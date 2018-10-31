@@ -75,6 +75,12 @@ const routes = [
         component: AppAccountEdit
       }
     ]
+  },
+  {
+    path: '*',
+    beforeEnter (to, from, next) {
+      next(from)
+    }
   }
 ]
 

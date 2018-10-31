@@ -25,7 +25,8 @@ const createUserData = () => ({
   },
   pictures: [],
   interests: [],
-  matches: []
+  matches: [],
+  popularity: 0
 })
 
 const store = new Vuex.Store({
@@ -115,6 +116,7 @@ const store = new Vuex.Store({
             store.commit('setUserData', ['interests', data.meta.interests])
             store.commit('setUserData', ['pictures', data.meta.pictures])
             store.commit('setUserData', ['matches', data.meta.matches])
+            store.commit('setUserData', ['popularity', data.meta.popularity])
 
             resolve()
           })
