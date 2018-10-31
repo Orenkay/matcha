@@ -15,12 +15,14 @@
     <m-form-field 
       :required="true" 
       :props="{type: 'password', placeholder: 'Your Password'}" 
+      :validate="passwordMatch"
       name="pass" 
       label="Password" 
       type="input" />
     <m-form-field 
       :required="true" 
       :props="{type: 'password', placeholder: 'Re-type Your Password'}" 
+      :validate="passwordMatch"
       name="pass2" 
       label="Re-Password" 
       type="input" />
@@ -30,6 +32,12 @@
 <script>
 export default {
   methods: {
+    passwordMatch(v, form) {
+      if (form.pass !== form.pass2) {
+        return ['password doesnt match']
+      }
+      return []
+    },
     submit(cb) {
       this.$refs.form.submit(data => {
         this.$http

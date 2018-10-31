@@ -37,3 +37,9 @@ services:
       - "3000:3000"
     environment:
       ENVIRONMENT: prod
+  
+  matcha-client:
+    build: ./assets/client
+    image: matcha-client
+    ports:
+      - "80:80"
