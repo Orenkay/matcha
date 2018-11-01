@@ -2,6 +2,7 @@ package localisation
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 )
 
@@ -55,6 +56,9 @@ func PlaceByID(placeID string) (*Place, error) {
 		err = json.NewDecoder(resp.Body).Decode(&d)
 		if err != nil {
 			return nil, err
+		}
+		if d == nil || d.Result.Address == "" {
+			return nil, errors.New("invalid placeID")
 		}
 	}
 
