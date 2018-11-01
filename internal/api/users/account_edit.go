@@ -23,6 +23,10 @@ func (data *AccountEditRequest) Bind(r *http.Request) error {
 	ve.Validation.Source = "AccountEdit"
 
 	validations.Username(ve, data.Username)
+	validations.EmailFormat(ve, data.Email)
+	if ve.Len() > 0 {
+		return ve
+	}
 
 	return nil
 }

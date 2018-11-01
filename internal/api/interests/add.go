@@ -3,6 +3,7 @@ package interests
 import (
 	"errors"
 	"net/http"
+	"regexp"
 	"strings"
 
 	"github.com/go-chi/render"
@@ -14,10 +15,15 @@ type AddRequest struct {
 	Value string `json:"value"`
 }
 
+var interestRegexp = regexp.MustCompile("^[a-zA-Z0-9]+$")
+
 func (data *AddRequest) Bind(r *http.Request) error {
 	data.Value = strings.ToLower(data.Value)
 	if len(data.Value) < 2 {
-		return errors.New("Interest must be atleast 2 chars long")
+		return errors.New("Interest value length must be >=2.")
+	}
+	if !interestRegexp.MatchString(data.Value) {
+		return errors.New("Interest value must contain only alphanumeric characters.")
 	}
 	return nil
 }

@@ -49,8 +49,8 @@
         <m-form-field 
           type="select" 
           name="sort" 
-          value="Default">
-          <option>Default</option>
+          value="Pertinence">
+          <option>Pertinence</option>
           <option>Distance</option>
           <option>Age</option>
           <option>Popularity</option>
