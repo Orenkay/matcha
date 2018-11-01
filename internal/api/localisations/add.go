@@ -53,6 +53,10 @@ func Add(s *store.Store) http.HandlerFunc {
 				render.Render(w, r, api.ErrInternal(err))
 				return
 			}
+			if p.Address == "" {
+				render.Render(w, r, api.ErrInvalidRequest(errors.New("Invalid parameters")))
+				return
+			}
 		}
 
 		l = &store.Localisation{
